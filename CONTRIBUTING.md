@@ -37,17 +37,6 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 - **Describe the current behavior and explain the behavior you expected**
 - **Explain why this enhancement would be useful**
 
-### Adding Arguments and Evidence 📚
-
-When contributing to the argument database:
-
-1. Ensure the argument doesn't already exist
-2. Follow the argument structure template
-3. Provide credible sources
-4. Use clear, neutral language
-5. Follow the citation format
-6. Include counter-arguments where applicable
-
 ### Your First Code Contribution 🎯
 
 Unsure where to begin? Start with issues labeled:
@@ -104,44 +93,6 @@ Unsure where to begin? Start with issues labeled:
 - Keep line length to a maximum of 80 characters
 - Use descriptive link texts
 
-### Argument Structure Template
-
-```markdown
-## Argument Title
-
-### Claim
-[Clear statement of the position]
-
-### Premises
-1. [First supporting point]
-2. [Second supporting point]
-3. [Additional points as needed]
-
-### Evidence
-- [Source 1]: Description of relevance
-- [Source 2]: Description of relevance
-
-### Counter-Arguments
-1. [Counter-point 1]
-   - [Rebuttal]
-2. [Counter-point 2]
-   - [Rebuttal]
-
-### Citations
-1. [Full citation in Chicago style]
-2. [Full citation in Chicago style]
-```
-
-## Development Environment Setup
-
-1. Install Node.js (v14 or higher)
-2. Install npm or yarn
-3. Clone the repository
-4. Run `npm install`
-5. Copy `.env.example` to `.env`
-6. Configure your environment variables
-7. Run `npm start`
-
 ## Testing
 
 - Write tests for new features
@@ -151,7 +102,6 @@ Unsure where to begin? Start with issues labeled:
 
 ## Community
 
-- Join our Discord server
 - Participate in discussions
 - Help review pull requests
 - Share ArgBase with others
@@ -161,8 +111,6 @@ Unsure where to begin? Start with issues labeled:
 Don't hesitate to ask questions. We're here to help! You can:
 
 - Open an issue
-- Join our Discord
-- Email the maintainers
 - Check the documentation
 
 ## Recognition
