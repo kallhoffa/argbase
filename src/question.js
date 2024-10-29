@@ -5,7 +5,7 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { storeQuestion } from './firestore-utils/firestore-question-storage'; // Import the function we created earlier
 
 
-// Mock data remains the same as before
+// Mock data
 // const mockQuestion = {
 //   /* Previous mock data structure... */
 //   id: 1,
@@ -47,10 +47,14 @@ import { storeQuestion } from './firestore-utils/firestore-question-storage'; //
 // Navigation Bar Component
 const NavigationBar = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
+    if (searchQuery.trim()) {
+      // Navigate to answer page with search query as parameter
+      navigate(`/question?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   return (
