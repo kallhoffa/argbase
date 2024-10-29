@@ -202,7 +202,7 @@ const QuestionPage = ({ db }) => {
 
       const newQuestionId = await storeQuestion(db, newQuestion);
       // Navigate to the new question page
-      navigate(`/answer?id=${newQuestionId}`);
+      navigate(`/question?id=${newQuestionId}`);
     } catch (err) {
       console.error('Error creating question:', err);
       setError('Failed to create question');

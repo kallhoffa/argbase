@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const NavigationBar = () => {
-    const [searchQuery, setSearchQuery] = useState('');
-    const navigate = useNavigate();
+const NavigationBar = ({ navigate: navigationOverride }) => {
+  const defaultNavigate = useNavigate();
+  const navigate = navigationOverride || defaultNavigate;
+  const [searchQuery, setSearchQuery] = useState('');
   
     const handleSubmit = (e) => {
       e.preventDefault();
