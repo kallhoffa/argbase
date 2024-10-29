@@ -305,6 +305,23 @@ const QuestionPage = ({ db }) => {
                       isTopAnswer={index === 0}
                     />
                   ))}
+                  {questionData.answers.length === 0 && (
+                    <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                        Be the first to answer this question
+                      </h3>
+                      <p className="text-gray-600 mb-8">
+                        Share your knowledge and help others learn
+                      </p>
+                      <button
+                        onClick={() => navigate(`/compose-answer?id=${questionData.id}`)}
+                        className="bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium 
+                                hover:bg-blue-700 transition-colors inline-flex items-center"
+                      >
+                        Add Answer
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
