@@ -7,6 +7,11 @@ const execPromise = util.promisify(exec);
 const MAX_ATTEMPTS = 5;
 const POLL_INTERVAL_MS = 30000;
 
+const args = process.argv.slice(2);
+const isProduction = args.includes('--prod');
+const targetUrl = isProduction ? 'https://argbase.org' : 'https://staging-argbase.web.app';
+const workflowName = isProduction ? 'firebase-deploy.yml' : 'firebase-deploy-staging.yml';
+
 async function checkGhInstalled() {
   try {
     execSync('gh --version', { stdio: 'pipe' });
@@ -27,7 +32,7 @@ async function run(cmd, options = {}) {
 
 async function getLatestRunId(commitSha) {
   try {
-    const { stdout } = await run('gh run list --workflow=firebase-deploy.yml --limit=10 --json databaseId,headSha');
+    const { stdout } = await run(`gh run list --workflow=${workflowName} --limit=10 --json databaseId,headSha`);
     const data = JSON.parse(stdout);
     
     if (commitSha) {
@@ -130,6 +135,9 @@ async function autoFix(errors) {
 }
 
 async function deploy(attempt = 1) {
+  console.log(`\n--- Deployment to ${isProduction ? 'Production' : 'Staging'} ---`);
+  console.log(`Target: ${targetUrl}`);
+  console.log(`Workflow: ${workflowName}`);
   console.log(`\n--- Deployment attempt ${attempt}/${MAX_ATTEMPTS} ---`);
 
   const ghInstalled = await checkGhInstalled();
@@ -149,6 +157,18 @@ async function deploy(attempt = 1) {
     console.log('  git checkout main');
     console.log('  git merge ' + branch);
     console.log('  git push');
+    return false;
+  }
+
+  if (isProduction) {
+    console.log('\n⚠ Production deployment requires creating a GitHub release.');
+    console.log('\nTo deploy to production:');
+    console.log('  1. Push your changes to main');
+    console.log('  2. Create a release:');
+    console.log('     git tag v0.x.x');
+    console.log('     git push --tags');
+    console.log('\nOr create a release manually at:');
+    console.log('  https://github.com/kallhoffa/argbase/releases/new');
     return false;
   }
 

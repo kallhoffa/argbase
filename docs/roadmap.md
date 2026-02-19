@@ -31,11 +31,18 @@ TEST_URL=http://localhost:3000 npm run integration-test  # Local
 ```
 Runs Playwright E2E tests against production or local.
 
-### `npm run deploy` - Deploy to Production
+### `npm run deploy` - Deploy to Staging
 ```bash
-npm run deploy   # Prompts for confirmation, waits for workflow, auto-fixes errors
+npm run deploy   # Pushes to main → auto-deploys to staging
 ```
-Builds, deploys to Firebase, runs integration tests.
+Builds, deploys to staging (https://staging-argbase.web.app), runs integration tests.
+
+### Deploy to Production
+```bash
+git tag v0.x.x
+git push --tags
+```
+Creates a GitHub release which triggers production deployment to https://argbase.org
 
 ---
 
@@ -43,8 +50,9 @@ Builds, deploys to Firebase, runs integration tests.
 
 1. **Local Development**: Agent uses TDD - write test first, then code
 2. **Validate**: `npm run check` (or `npm run test:ci && npm run lint`)
-3. **Deploy**: `npm run deploy` (requires user approval)
-4. **Verify**: `npm run integration-test`
+3. **Deploy to staging**: `npm run deploy` - auto-deploys to staging
+4. **Verify on staging**: `npm run integration-test` or visit https://staging-argbase.web.app
+5. **Deploy to production**: Create a GitHub release (`git tag v0.x.x && git push --tags`)
 
 ---
 
@@ -60,8 +68,9 @@ Builds, deploys to Firebase, runs integration tests.
 | `npm run check` | Full validation (test + lint + build) |
 | `npm run harden` | Pre-deploy checks (audit, bundle size, a11y) |
 | `npm run build` | Production build |
-| `npm run deploy` | Deploy to production (requires user approval) |
-| `npm run integration-test` | Run E2E tests on production |
+| `npm run deploy` | Deploy to staging (auto on push to main) |
+| `npm run integration-test` | Run E2E tests on staging (default) |
+| `git tag v0.x.x && git push --tags` | Deploy to production |
 
 ---
 

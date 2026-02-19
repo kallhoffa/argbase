@@ -1,8 +1,9 @@
-name: Deploy to Production
+name: Deploy to Staging
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -22,18 +23,22 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Firebase
+      - name: Deploy to Firebase Staging
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only hosting
+          args: hosting:channel:deploy staging --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
-      - name: Run Integration Tests on Production
-        run: npx playwright test tests/e2e
+      - name: Run Integration Tests on Staging
+        run: |
+          echo "Waiting for staging to deploy..."
+          sleep 30
+          npx playwright test tests/e2e
+        env:
+          TEST_URL: https://staging-argbase.web.app
 
       - name: Upload logs on failure
         if: failure()
         run: |
-          echo "## Deployment Failed" >> $GITHUB_STEP_SUMMARY
-          echo "Check the logs above for errors." >> $GITHUB_STEP_SUMMARY
+          echo "## Staging Deployment or Tests Failed" >> $GITHUB_STEP_SUMMARY

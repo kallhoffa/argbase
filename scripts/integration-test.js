@@ -9,7 +9,7 @@ const POLL_INTERVAL_MS = 10000;
 
 const DEFAULT_CONFIG = {
   maxRetries: MAX_ATTEMPTS,
-  testUrl: 'https://argbase.org',
+  testUrl: 'https://staging-argbase.web.app',
   timeout: 60000,
 };
 

@@ -51,8 +51,15 @@ npm run check   # Runs: test (ci mode) → lint → build
 
 ### Deployment
 ```bash
-npm run deploy    # Push changes, run CI, auto-fix errors (max 5 attempts)
+npm run deploy    # Push to main → auto-deploys to staging (https://staging-argbase.web.app)
 ```
+
+**To deploy to production:**
+```bash
+git tag v0.x.x
+git push --tags
+```
+This creates a GitHub release which triggers production deployment to https://argbase.org
 
 ### Feature Branch Workflow
 
@@ -62,7 +69,8 @@ npm run deploy    # Push changes, run CI, auto-fix errors (max 5 attempts)
 3. Validate: `npm run check`
 4. Commit and push: `git add -A && git commit -m "feat: description" && git push -u origin feature/your-feature-name`
 5. Create a PR or merge to main when ready
-6. Deploy from main: `npm run deploy`
+6. Push to main auto-deploys to staging
+7. Verify on staging, then create release for production
 
 ---
 

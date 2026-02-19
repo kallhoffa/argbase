@@ -5,7 +5,7 @@ module.exports = defineConfig({
   timeout: 30000,
   retries: 1,
   use: {
-    baseURL: process.env.TEST_URL || 'http://localhost:3000',
+    baseURL: process.env.TEST_URL || 'https://staging-argbase.web.app',
     trace: 'on-first-retry',
     headless: true,
   },
