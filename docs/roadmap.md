@@ -1,76 +1,91 @@
 * Finish automation - desired development flow is user saying "lets work on next roadmap feature" and opencode agent running on loop, pausing for questions, until functionality is deployed and tested on production. including local testing, hardening, deployment, integration testing.
-  * add try loop for local testing
-  * add try loop for integration testing
-* **Automation Plan**
 
-  ## Configuration (config/automation.json)
-  ```json
-  {
-    "maxRetries": {
-      "localTests": 3,
-      "build": 2,
-      "deployment": 5,
-      "integrationTests": 3
-    },
-    "pausePoints": ["afterLocalTests", "onAmbiguous"],
-    "integrationTestUrl": "https://argbase.org"
-  }
-  ```
+## Current Status
 
-  ## Scripts to Create
+### ✅ Completed
+- **Deploy script** - Matches workflow by commit SHA, prompts for confirmation before push
+- **Integration tests** - Playwright E2E tests with console error detection
+- **Local validation** - `npm run check` (test + lint + build)
+- **TDD workflow** - Agent guidance in AGENTS.md
+- **Firestore rules** - Deployed and working
 
-  ### 1. `scripts/develop.js` - Local Dev Loop
-  - Watch source files for changes
-  - Run `npm test -- --watchAll=false` on each change
-  - Run `npm run build` to catch build errors
-  - Run `npx eslint src/` for linting
-  - Retry loop with `config.maxRetries.localTests` attempts
-  - **Pause for user questions** after local tests pass
+### 🔲 Remaining
+- `scripts/harden.js` - Pre-deployment security/accessibility checks
+- `scripts/workon.js` - Feature orchestrator (optional - agent handles this)
 
-  ### 2. `scripts/harden.js` - Pre-deployment Checks
-  - Run `npm audit` for security vulnerabilities
-  - Accessibility checks with axe-core
-  - Bundle size validation
-  - Retry loop with `config.maxRetries.build` attempts
+---
 
-  ### 3. `scripts/integration-test.js` - E2E Tests (DONE)
-  - Install Playwright: `npm install -D @playwright/test` ✓
-  - Add playwright config for CI ✓
-  - Create `tests/e2e/*.spec.js` for critical user flows ✓
-  - Run against deployed URL (config.integrationTestUrl) or localhost
-  - Retry loop with `config.maxRetries.integrationTests` attempts
-  - Run with `npm run integration-test` or `node scripts/integration-test.js`
+## Scripts
 
-  ### 4. `scripts/workon.js` - Feature Orchestrator
-  - Create feature branch from main
-  - Coordinate: local tests → harden → commit → push → deploy → integration test
-  - **Pause for user questions** when:
-    - After local tests pass (confirm before proceeding)
-    - When intent is ambiguous (e.g., "fix the thing" - ask which thing)
-  - Retry loop with `config.maxRetries.deployment` attempts
-  - Auto-fix common errors (eslint, missing deps, similar to deploy.js)
+### `npm run check` - Local Validation
+```bash
+npm run check   # Runs: test (ci mode) → lint → build
+```
+Validates code before committing or deploying.
 
-  ## Workflow Example
-  ```
-  User: "lets work on adding user profiles"
+### `npm run integration-test` - E2E Tests
+```bash
+npm run integration-test   # Runs against https://argbase.org
+TEST_URL=http://localhost:3000 npm run integration-test  # Local
+```
+Runs Playwright E2E tests against production or local.
 
-  Agent loop:
-  1. Create branch: feature/user-profiles
-  2. Run develop.js (local test loop)
-     → Pause: "Local tests passing. Proceed to deployment?"
-  3. Run harden.js (security/accessibility)
-  4. Commit & push
-  5. Run deploy.js (existing)
-  6. Run integration-test.js (Playwright)
-     → Success: "Deployed and tested!"
-     → Failure: Auto-fix retry OR pause: "Tests failed. Fix or abort?"
-  ```
+### `npm run deploy` - Deploy to Production
+```bash
+npm run deploy   # Prompts for confirmation, waits for workflow, auto-fixes errors
+```
+Builds, deploys to Firebase, runs integration tests.
 
-  ## Implementation Order
-  1. Create `config/automation.json` with retry limits (skip - using defaults in script)
-  2. Add Playwright to package.json ✓
-  3. Create `scripts/develop.js` (next)
-  4. Create `scripts/harden.js`
-  5. Create `scripts/integration-test.js` ✓
-  6. Update `scripts/workon.js` (or create it)
-  7. Write initial E2E tests for critical paths ✓
+---
+
+## Development Workflow
+
+1. **Local Development**: Agent uses TDD - write test first, then code
+2. **Validate**: `npm run check` (or `npm run test:ci && npm run lint`)
+3. **Deploy**: `npm run deploy` (requires user approval)
+4. **Verify**: `npm run integration-test`
+
+---
+
+## Commands Reference
+
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start dev server |
+| `npm run test` | Run tests in watch mode |
+| `npm run test:ci` | Run tests once (CI mode) |
+| `npm run lint` | Lint source files |
+| `npm run lint:fix` | Auto-fix lint errors |
+| `npm run check` | Full validation (test + lint + build) |
+| `npm run build` | Production build |
+| `npm run deploy` | Deploy to production |
+| `npm run integration-test` | Run E2E tests on production |
+
+---
+
+## E2E Tests
+
+Tests are in `tests/e2e/` and run with Playwright.
+
+```bash
+# Production
+npx playwright test tests/e2e
+
+# Local
+TEST_URL=http://localhost:3000 npx playwright test tests/e2e
+```
+
+### Test Coverage
+- Home page loads
+- Search functionality
+- Question page loading states
+- Error handling and console error detection
+
+---
+
+## Agent Constraints (from AGENTS.md)
+
+- **NEVER** run `npm run deploy`, `git push`, or any deployment commands without explicit user approval
+- **ALWAYS** ask for confirmation before executing deployment-related operations
+- **Always use TDD** - Write test first, then code
+- **Run `npm run check`** before committing to validate everything
