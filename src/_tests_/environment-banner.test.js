@@ -17,8 +17,8 @@ describe('EnvironmentBanner', () => {
       value: new URL('https://argbase.org'),
       writable: true,
     });
-    const { container } = render(<EnvironmentBanner />);
-    expect(container.firstChild).toBeNull();
+    render(<EnvironmentBanner />);
+    expect(screen.queryByText(/Running on localhost/)).toBeNull();
   });
 
   test('renders banner on localhost', () => {

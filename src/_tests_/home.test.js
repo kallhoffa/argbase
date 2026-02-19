@@ -55,8 +55,8 @@ describe('Home', () => {
   });
 
   test('has correct structure', () => {
-    const { container } = renderWithRouter(<Home />);
-    expect(container.querySelector('.min-h-screen')).toBeInTheDocument();
-    expect(container.querySelector('.bg-gradient-to-b')).toBeInTheDocument();
+    renderWithRouter(<Home />);
+    expect(screen.getByRole('heading')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 });

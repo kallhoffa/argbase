@@ -33,6 +33,20 @@ npm run build          # Build for production (auto-updates browserslist)
 npm test                           # Run all tests in watch mode
 npm test -- --watchAll=false      # Run all tests once
 npm test -- --watchAll=false --testPathPattern="navigation"  # Run single test file
+npm run check                     # Run test + lint + build (full validation)
+```
+
+### Development Workflow (TDD)
+
+**Always use Test-Driven Development:**
+1. Write the test first (it will fail)
+2. Write the minimum code to make the test pass
+3. Refactor if needed
+4. Run `npm run check` before committing to validate everything
+
+**Before deployment, always run:**
+```bash
+npm run check   # Runs: test (ci mode) → lint → build
 ```
 
 ### Deployment
