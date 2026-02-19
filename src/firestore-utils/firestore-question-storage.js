@@ -98,27 +98,3 @@ export const addAnswerToQuestion = async (db, questionId, newAnswer) => {
     throw error;
   }
 };
-
-// Example usage:
-const exampleQuestion = {
-  title: "What is gravity?",
-  answers: [
-    {
-      content: "Gravity is a fundamental force of nature...",
-      upvotes: 1427,
-      downvotes: 124,
-      author: "PhysicsProf",
-      comments: [
-        {
-          content: "Great explanation!",
-          author: "QuantumLearner",
-          upvotes: 89
-        }
-      ]
-    }
-  ],
-  relatedQuestions: [
-    "How does gravity affect time?",
-    "What is the gravitational constant?"
-  ]
-};

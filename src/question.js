@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ThumbsUp, ThumbsDown, MessageCircle, ExternalLink, ChevronRight, Search } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, MessageCircle, ExternalLink, ChevronRight } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { storeQuestion } from './firestore-utils/firestore-question-storage'; // Import the function we created earlier
