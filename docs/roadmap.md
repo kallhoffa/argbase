@@ -1,4 +1,4 @@
-* Finish automation - desired development flow is user saying "lets work on next roadmap feature" and opencode agent running on loop, pausing for questions, until functionality is deployed and tested on production. including local testing, hardening, deployment, integration testing.
+# Roadmap
 
 ## Current Status
 
@@ -10,49 +10,13 @@
 - **TDD workflow** - Agent guidance in AGENTS.md
 - **Firestore rules** - Deployed and working
 - **E2E tests** - Console error detection for Firebase issues
+- **Staging environment** - Separate Firebase project with auto-deploy
+- **Production environment** - Release-based manual deploy
+- **Environment banners** - Visual distinction between staging/production
+- **ADR documentation** - Decision record for automation workflow
 
-### 🔲 Remaining
-- `scripts/workon.js` - Feature orchestrator (optional - agent handles this)
-
----
-
-## Scripts
-
-### `npm run check` - Local Validation
-```bash
-npm run check   # Runs: test (ci mode) → lint → build
-```
-Validates code before committing or deploying.
-
-### `npm run integration-test` - E2E Tests
-```bash
-npm run integration-test   # Runs against https://argbase.org
-TEST_URL=http://localhost:3000 npm run integration-test  # Local
-```
-Runs Playwright E2E tests against production or local.
-
-### `npm run deploy` - Deploy to Staging
-```bash
-npm run deploy   # Pushes to main → auto-deploys to staging
-```
-Builds, deploys to staging (https://argbase-staging.web.app), runs integration tests.
-
-### Deploy to Production
-```bash
-git tag v0.x.x
-git push --tags
-```
-Creates a GitHub release which triggers production deployment to https://argbase.org
-
----
-
-## Development Workflow
-
-1. **Local Development**: Agent uses TDD - write test first, then code
-2. **Validate**: `npm run check` (or `npm run test:ci && npm run lint`)
-3. **Deploy to staging**: `npm run deploy` - auto-deploys to staging
-4. **Verify on staging**: `npm run integration-test` or visit https://staging-argbase.web.app
-5. **Deploy to production**: Create a GitHub release (`git tag v0.x.x && git push --tags`)
+### 🔲 Next
+- **Enhanced security audit** - Beyond npm audit (Snyk, Dependabot alerts, etc.)
 
 ---
 
@@ -69,34 +33,15 @@ Creates a GitHub release which triggers production deployment to https://argbase
 | `npm run harden` | Pre-deploy checks (audit, bundle size, a11y) |
 | `npm run build` | Production build |
 | `npm run deploy` | Deploy to staging (auto on push to main) |
-| `npm run integration-test` | Run E2E tests on staging (default) |
+| `npm run integration-test` | Run E2E tests on staging |
 | `git tag v0.x.x && git push --tags` | Deploy to production |
 
 ---
 
-## E2E Tests
+## Environment URLs
 
-Tests are in `tests/e2e/` and run with Playwright.
-
-```bash
-# Production
-npx playwright test tests/e2e
-
-# Local
-TEST_URL=http://localhost:3000 npx playwright test tests/e2e
-```
-
-### Test Coverage
-- Home page loads
-- Search functionality
-- Question page loading states
-- Error handling and console error detection
-
----
-
-## Agent Constraints (from AGENTS.md)
-
-- **NEVER** run `npm run deploy`, `git push`, or any deployment commands without explicit user approval
-- **ALWAYS** ask for confirmation before executing deployment-related operations
-- **Always use TDD** - Write test first, then code
-- **Run `npm run check`** before committing to validate everything
+| Environment | URL | Trigger |
+|------------|-----|---------|
+| Local | http://localhost:3000 | `npm start` |
+| Staging | https://argbase-staging.web.app | Push to main |
+| Production | https://argbase.org | GitHub release |
