@@ -108,7 +108,3 @@ This project is licensed under the Apache License - see the [LICENSE.md](LICENSE
 - All our contributors and community members
 - Organizations and individuals who have provided feedback and support
 - Open source projects that have made this possible
-
----
-
-Built with ❤️ (and Claude.ai) for better arguments

@@ -214,7 +214,7 @@ const QuestionPage = ({ db }) => {
       <NavigationBar />
       
       <div className="pt-16">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto px-4 py-12">
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>

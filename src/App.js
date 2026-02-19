@@ -6,6 +6,7 @@ import QuestionPage from './question';
 import Home from './home';
 import ComposeAnswer from './compose-answer';
 import EnvironmentBanner from './environment-banner';
+import About from './about';
 
 
 const RootLayout = () => {
@@ -27,6 +28,7 @@ function App({ db }) {
           <Route path="/" element={<Home/>} />
           <Route path="/question" element={<QuestionPage db={db}/>} />
           <Route path="/compose-answer" element={<ComposeAnswer db={db} />} />
+          <Route path="/about" element={<About/>} />
         </Route>
       </Routes>
     </BrowserRouter>

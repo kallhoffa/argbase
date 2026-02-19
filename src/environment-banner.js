@@ -7,7 +7,7 @@ const EnvironmentBanner = () => {
   if (!isLocalhost) return null;
 
   return (
-    <div className="bg-yellow-500 text-center p-2 text-white font-medium fixed w-full top-0 z-[100]">
+    <div className="bg-yellow-500 text-center p-2 text-white font-medium fixed w-full bottom-0 z-[100]">
       Running on localhost - Development Environment
     </div>
   );
