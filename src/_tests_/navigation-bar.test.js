@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import NavigationBar from './navigation-bar';
+import NavigationBar from '../navigation-bar';
 
 const renderWithRouter = (component) => {
   return render(

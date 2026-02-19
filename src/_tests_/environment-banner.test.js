@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import EnvironmentBanner from './environment-banner';
+import EnvironmentBanner from '../environment-banner';
 
 describe('EnvironmentBanner', () => {
   const originalHostname = window.location.hostname;
