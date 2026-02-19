@@ -1,10 +1,20 @@
 const { execSync, exec } = require('child_process');
 const util = require('util');
+const path = require('path');
 
 const execPromise = util.promisify(exec);
 
 const MAX_ATTEMPTS = 5;
 const POLL_INTERVAL_MS = 30000;
+
+async function checkGhInstalled() {
+  try {
+    execSync('gh --version', { stdio: 'pipe' });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 async function run(cmd, options = {}) {
   try {
@@ -115,6 +125,13 @@ async function autoFix(errors) {
 
 async function deploy(attempt = 1) {
   console.log(`\n--- Deployment attempt ${attempt}/${MAX_ATTEMPTS} ---`);
+
+  const ghInstalled = await checkGhInstalled();
+  if (!ghInstalled) {
+    console.error('GitHub CLI (gh) is not installed.');
+    console.error('Install it from: https://cli.github.com/');
+    return false;
+  }
 
   if (attempt > MAX_ATTEMPTS) {
     console.log('Max attempts reached. Deployment failed.');
