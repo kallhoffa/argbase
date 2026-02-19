@@ -35,7 +35,7 @@ Runs Playwright E2E tests against production or local.
 ```bash
 npm run deploy   # Pushes to main → auto-deploys to staging
 ```
-Builds, deploys to staging (https://staging-argbase.web.app), runs integration tests.
+Builds, deploys to staging (https://argbase-staging.web.app), runs integration tests.
 
 ### Deploy to Production
 ```bash

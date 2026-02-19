@@ -51,7 +51,7 @@ npm run check   # Runs: test (ci mode) → lint → build
 
 ### Deployment
 ```bash
-npm run deploy    # Push to main → auto-deploys to staging (https://staging-argbase.web.app)
+npm run deploy    # Push changes, run CI, auto-deploys to staging (https://argbase-staging.web.app)
 ```
 
 **To deploy to production:**
