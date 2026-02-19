@@ -38,6 +38,61 @@
 
 ---
 
+## Directory Structure
+
+```
+argbase/
+├── .github/
+│   └── workflows/          # GitHub Actions CI/CD
+│       ├── firebase-deploy.yml
+│       └── firebase-deploy-staging.yml
+├── .firebaserc             # Firebase project aliases
+├── .gitignore
+├── AGENTS.md               # Agent constraints and workflow guidance
+├── firebase.json
+├── firestore.rules
+├── firestore.indexes.json
+├── package.json
+├── playwright.config.js
+├── public/
+│   └── index.html
+├── scripts/
+│   ├── deploy.js
+│   ├── harden.js
+│   └── integration-test.js
+├── src/
+│   ├── _tests_/            # Unit tests (Jest)
+│   │   ├── App.test.js
+│   │   ├── environment-banner.test.js
+│   │   ├── home.test.js
+│   │   └── navigation-bar.test.js
+│   ├── components/         # React components
+│   ├── firestore-utils/    # Firebase utilities
+│   ├── environment-banner.js
+│   ├── home.js
+│   ├── index.js
+│   ├── navigation-bar.js
+│   └── question.js
+├── tests/
+│   └── e2e/                # Playwright E2E tests
+│       ├── home.spec.js
+│       └── question.spec.js
+└── docs/
+    ├── adr/                # Architecture Decision Records
+    │   └── 001-automated-deployment-pipeline.md
+    ├── ADR-001-Argument-Hierarchy.md
+    └── roadmap.md
+```
+
+### Test Locations
+
+| Type | Location | Command |
+|------|----------|---------|
+| Unit | `src/_tests_/` | `npm run test` |
+| E2E | `tests/e2e/` | `npm run integration-test` |
+
+---
+
 ## Environment URLs
 
 | Environment | URL | Trigger |
