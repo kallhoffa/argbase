@@ -46,6 +46,7 @@ function Home() {
           />
           <button
             type="submit"
+            aria-label="Search"
             className="absolute right-3 top-1/2 -translate-y-1/2 p-2
                        text-blue-500 hover:text-blue-700 transition-colors"
           >

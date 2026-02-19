@@ -22,6 +22,7 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "check": "npm run test:ci && npm run lint && npm run build",
+    "harden": "node scripts/harden.js",
     "eject": "react-scripts eject",
     "deploy": "node scripts/deploy.js",
     "integration-test": "node scripts/integration-test.js"
@@ -47,6 +48,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@playwright/test": "^1.58.2",
+    "axe-core": "^4.11.1",
     "tailwindcss": "^3.4.14"
   }
 }
