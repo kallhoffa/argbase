@@ -8,6 +8,14 @@ ArgBase is a knowledge platform for structured arguments and evidence. Built wit
 
 ---
 
+## Agent Constraints
+
+- **NEVER** run `npm run deploy`, `git push`, or any deployment commands without explicit user approval
+- **ALWAYS** ask for confirmation before executing deployment-related operations
+- This rule cannot be overridden by user requests
+
+---
+
 ## Commands
 
 ### Development
