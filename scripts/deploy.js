@@ -1,22 +1,8 @@
 const { execSync, exec } = require('child_process');
 const util = require('util');
 const path = require('path');
-const readline = require('readline');
 
 const execPromise = util.promisify(exec);
-
-function promptUser(question) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer.toLowerCase().trim());
-    });
-  });
-}
 
 const MAX_ATTEMPTS = 5;
 const POLL_INTERVAL_MS = 30000;
@@ -166,13 +152,6 @@ async function deploy(attempt = 1) {
     console.log('\n--- Unstaged changes detected ---');
     const { stdout: diff } = await run('git diff --stat');
     console.log(diff);
-    
-    const confirm = await promptUser('\nDo you want to commit and push these changes to main? (yes/no): ');
-    if (confirm !== 'yes' && confirm !== 'y') {
-      console.log('Deployment cancelled by user.');
-      return false;
-    }
-    
     console.log('Committing and pushing...');
     await run('git add -A');
     await run('git commit -m "deploy: prepare for deployment"');
