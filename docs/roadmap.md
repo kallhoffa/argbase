@@ -13,7 +13,7 @@
       "integrationTests": 3
     },
     "pausePoints": ["afterLocalTests", "onAmbiguous"],
-    "integrationTestUrl": "https://argbase.web.app"
+    "integrationTestUrl": "https://argbase.org"
   }
   ```
 

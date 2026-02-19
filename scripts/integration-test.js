@@ -9,7 +9,7 @@ const POLL_INTERVAL_MS = 10000;
 
 const DEFAULT_CONFIG = {
   maxRetries: MAX_ATTEMPTS,
-  testUrl: 'https://argbase.web.app',
+  testUrl: 'https://argbase.org',
   timeout: 60000,
 };
 
@@ -72,7 +72,12 @@ async function runTests(config, attempt = 1) {
   const testCommand = `npx playwright test --reporter=list`;
 
   try {
-    const { stdout, stderr, error } = await run(testCommand, { timeout: config.timeout });
+    const { stdout, stderr, error } = await run(testCommand, { 
+      timeout: config.timeout,
+      env: { ...process.env, TEST_URL: config.testUrl }
+    });
+    
+    console.log(stdout);
 
     if (error) {
       console.log('Test run had errors:', error.message);

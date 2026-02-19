@@ -25,10 +25,16 @@ async function run(cmd, options = {}) {
   }
 }
 
-async function getLatestRunId() {
+async function getLatestRunId(commitSha) {
   try {
-    const { stdout } = await run('gh run list --workflow=firebase-deploy.yml --limit=1 --json databaseId');
+    const { stdout } = await run('gh run list --workflow=firebase-deploy.yml --limit=10 --json databaseId,headSha');
     const data = JSON.parse(stdout);
+    
+    if (commitSha) {
+      const run = data.find(r => r.headSha === commitSha);
+      return run ? run.databaseId : null;
+    }
+    
     return data[0]?.databaseId || null;
   } catch (e) {
     console.error('Failed to get run ID:', e.message);
@@ -141,6 +147,7 @@ async function deploy(attempt = 1) {
   const beforeRunId = await getLatestRunId();
 
   const { stdout: status } = await run('git status --porcelain');
+  let pushedCommitSha = null;
   if (status.trim()) {
     console.log('Unstaged changes found, committing...');
     await run('git add -A');
@@ -149,14 +156,17 @@ async function deploy(attempt = 1) {
     console.log('Changes pushed.');
   }
 
+  const { stdout: currentCommit } = await run('git rev-parse HEAD');
+  pushedCommitSha = currentCommit.trim();
+
   await new Promise(r => setTimeout(r, 5000));
 
-  let runId = await getLatestRunId();
+  let runId = await getLatestRunId(pushedCommitSha);
   let waitCount = 0;
-  while (runId === beforeRunId && waitCount < 12) {
-    console.log('Waiting for workflow to start...');
+  while (!runId && waitCount < 12) {
+    console.log(`Waiting for workflow to start for commit ${pushedCommitSha.substring(0, 7)}...`);
     await new Promise(r => setTimeout(r, 5000));
-    runId = await getLatestRunId();
+    runId = await getLatestRunId(pushedCommitSha);
     waitCount++;
   }
 
