@@ -23,12 +23,12 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Firebase Preview Channel
+      - name: Deploy to Firebase Staging
         uses: w9jds/firebase-action@master
         with:
-          args: hosting:channel:deploy staging --only hosting
+          args: deploy --only hosting -P staging
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN_STAGING }}
 
       - name: Run Integration Tests on Staging
         run: |
@@ -36,7 +36,7 @@ jobs:
           sleep 30
           npx playwright test tests/e2e
         env:
-          TEST_URL: https://staging-argbase.web.app
+          TEST_URL: https://argbase-staging.web.app
 
       - name: Upload logs on failure
         if: failure()

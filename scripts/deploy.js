@@ -9,7 +9,7 @@ const POLL_INTERVAL_MS = 30000;
 
 const args = process.argv.slice(2);
 const isProduction = args.includes('--prod');
-const targetUrl = isProduction ? 'https://argbase.org' : 'https://staging-argbase.web.app';
+const targetUrl = isProduction ? 'https://argbase.org' : 'https://argbase-staging.web.app';
 const workflowName = isProduction ? 'firebase-deploy.yml' : 'firebase-deploy-staging.yml';
 
 async function checkGhInstalled() {
