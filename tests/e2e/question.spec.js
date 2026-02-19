@@ -12,6 +12,13 @@ test.describe('Question Page', () => {
   });
 
   test('should handle question not found or error gracefully', async ({ page }) => {
+    const consoleErrors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      }
+    });
+
     await page.goto('/question?q=nonexistentquestion12345');
     await expect(page.locator('text=Loading...')).toBeVisible();
     await expect(page.locator('text=Loading...')).toBeHidden({ timeout: 10000 });
@@ -19,24 +26,25 @@ test.describe('Question Page', () => {
     const hasError = await page.locator('text=Failed to load question data').isVisible();
     const hasNoMatch = await page.locator('text=No matches found').isVisible();
     
+    console.log('Console errors captured:', consoleErrors);
+    expect(consoleErrors).toHaveLength(0);
     expect(hasError || hasNoMatch).toBe(true);
   });
 
-  test('should display error message on load failure', async ({ page }) => {
+  test('should load question data without console errors', async ({ page }) => {
     const consoleErrors = [];
     page.on('console', msg => {
       if (msg.type() === 'error') {
         consoleErrors.push(msg.text());
       }
     });
-    
+
     await page.goto('/question?q=test');
     await expect(page.locator('text=Loading...')).toBeVisible();
     await expect(page.locator('text=Loading...')).toBeHidden({ timeout: 10000 });
     
-    const hasError = await page.locator('text=Failed to load question data').isVisible();
-    const hasNoMatch = await page.locator('text=No matches found').isVisible();
+    console.log('Console errors on question load:', consoleErrors);
     
-    expect(hasError || hasNoMatch).toBe(true);
+    expect(consoleErrors).toHaveLength(0);
   });
 });
