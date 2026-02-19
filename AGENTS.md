@@ -267,3 +267,48 @@ npm test -- --watchAll=false  # Default test location: src/_tests_/
 ```bash
 npx eslint src/ --fix  # Auto-fix some issues
 ```
+
+---
+
+## Testing
+
+### Unit Tests
+```bash
+npm test                           # Run all tests in watch mode
+npm test -- --watchAll=false      # Run all tests once
+```
+
+### E2E Tests (Playwright)
+
+E2E tests are located in `tests/e2e/` and test the production application.
+
+**Run against local development server:**
+```bash
+npm start  # Start dev server in one terminal
+TEST_URL=http://localhost:3000 npx playwright test tests/e2e
+```
+
+**Run against production (argbase.org):**
+```bash
+npx playwright test tests/e2e
+```
+
+**Using the integration-test script:**
+```bash
+npm run integration-test  # Runs against production by default
+```
+
+The `playwright.config.js` defaults to production URL (`https://argbase.org`). Set `TEST_URL` environment variable to override.
+
+### Deployment Flow
+
+1. **Development**: Work on features/fixes locally
+2. **Testing**: Run E2E tests locally with `TEST_URL=http://localhost:3000`
+3. **Deploy**: Run `npm run deploy`
+   - Script will prompt for confirmation before pushing to main
+   - Waits for GitHub workflow to complete
+   - Auto-fixes common errors (ESLint, missing dependencies)
+   - Polls for the correct workflow run based on commit SHA
+4. **Verify**: Run E2E tests against production:
+   - `npx playwright test tests/e2e` (production)
+   - `npm run integration-test` (production)
