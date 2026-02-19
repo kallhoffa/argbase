@@ -3,14 +3,15 @@
 ## Current Status
 
 ### ✅ Completed
-- **Deploy script** - Matches workflow by commit SHA, prompts for confirmation before push
+- **Deploy script** - Matches workflow by commit SHA
 - **Integration tests** - Playwright E2E tests with console error detection
 - **Local validation** - `npm run check` (test + lint + build)
+- **Hardening** - `npm run harden` (security, bundle size, accessibility)
 - **TDD workflow** - Agent guidance in AGENTS.md
 - **Firestore rules** - Deployed and working
+- **E2E tests** - Console error detection for Firebase issues
 
 ### 🔲 Remaining
-- `scripts/harden.js` - Pre-deployment security/accessibility checks
 - `scripts/workon.js` - Feature orchestrator (optional - agent handles this)
 
 ---
@@ -57,8 +58,9 @@ Builds, deploys to Firebase, runs integration tests.
 | `npm run lint` | Lint source files |
 | `npm run lint:fix` | Auto-fix lint errors |
 | `npm run check` | Full validation (test + lint + build) |
+| `npm run harden` | Pre-deploy checks (audit, bundle size, a11y) |
 | `npm run build` | Production build |
-| `npm run deploy` | Deploy to production |
+| `npm run deploy` | Deploy to production (requires user approval) |
 | `npm run integration-test` | Run E2E tests on production |
 
 ---
