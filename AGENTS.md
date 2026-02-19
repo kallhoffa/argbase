@@ -54,6 +54,16 @@ npm run check   # Runs: test (ci mode) → lint → build
 npm run deploy    # Push changes, run CI, auto-fix errors (max 5 attempts)
 ```
 
+### Feature Branch Workflow
+
+**Always work on feature branches:**
+1. Create a branch: `git checkout -b feature/your-feature-name`
+2. Make changes with TDD
+3. Validate: `npm run check`
+4. Commit and push: `git add -A && git commit -m "feat: description" && git push -u origin feature/your-feature-name`
+5. Create a PR or merge to main when ready
+6. Deploy from main: `npm run deploy`
+
 ---
 
 ## Code Style Guidelines

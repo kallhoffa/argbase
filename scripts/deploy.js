@@ -139,6 +139,19 @@ async function deploy(attempt = 1) {
     return false;
   }
 
+  const { stdout: currentBranch } = await run('git branch --show-current');
+  const branch = currentBranch.trim();
+  
+  if (branch !== 'main' && branch !== 'master') {
+    console.log(`\n⚠ You are on branch: ${branch}`);
+    console.log('Deployments should only be made from main branch.');
+    console.log('Please merge your changes to main first:');
+    console.log('  git checkout main');
+    console.log('  git merge ' + branch);
+    console.log('  git push');
+    return false;
+  }
+
   if (attempt > MAX_ATTEMPTS) {
     console.log('Max attempts reached. Deployment failed.');
     return false;
