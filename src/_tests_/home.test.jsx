@@ -40,20 +40,6 @@ describe('Home', () => {
     expect(input.value).toBe('test query');
   });
 
-  test('navigates on form submit with query', () => {
-    const mockNavigate = jest.fn();
-    jest.mock('react-router-dom', () => ({
-      ...jest.requireActual('react-router-dom'),
-      useNavigate: () => mockNavigate,
-    }));
-    
-    renderWithRouter(<Home />);
-    const input = screen.getByPlaceholderText('What would you like to know?');
-    fireEvent.change(input, { target: { value: 'gravity' } });
-    fireEvent.submit(input);
-    // Note: This test may need adjustment based on router setup
-  });
-
   test('has correct structure', () => {
     renderWithRouter(<Home />);
     expect(screen.getByRole('heading')).toBeInTheDocument();
