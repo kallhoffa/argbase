@@ -21,9 +21,9 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "check": "npm run test:ci && npm run lint && npm run build",
-    "harden": "node scripts/harden.js",
-    "deploy": "node scripts/deploy.js",
-    "integration-test": "node scripts/integration-test.js"
+    "harden": "node scripts/harden.cjs",
+    "deploy": "node scripts/deploy.cjs",
+    "integration-test": "node scripts/integration-test.cjs"
   },
   "eslintConfig": {
     "extends": [
