@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
 
 test.describe('Question Page', () => {
   test('should show loading state initially', async ({ page }) => {

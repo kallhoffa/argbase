@@ -2,30 +2,26 @@
   "name": "argbase",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^14.6.1",
-    "ajv": "^8.18.0",
     "firebase": "^11.0.1",
     "lucide-react": "^0.454.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.0",
-    "react-scripts": "5.0.1",
     "tailwindcss": "^3.4.19",
     "web-vitals": "^5.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "npx update-browserslist-db@latest --yes && react-scripts build",
-    "test": "react-scripts test",
-    "test:ci": "react-scripts test --watchAll=false",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ci": "vitest run",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "check": "npm run test:ci && npm run lint && npm run build",
     "harden": "node scripts/harden.js",
-    "eject": "react-scripts eject",
     "deploy": "node scripts/deploy.js",
     "integration-test": "node scripts/integration-test.js"
   },
@@ -35,21 +31,14 @@
       "react-app/jest"
     ]
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@playwright/test": "^1.58.2",
-    "axe-core": "^4.11.1"
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@vitejs/plugin-react": "^4.7.0",
+    "axe-core": "^4.11.1",
+    "vite": "^6.4.1",
+    "vitest": "^4.0.18"
   }
 }
