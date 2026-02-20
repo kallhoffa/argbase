@@ -1,6 +1,6 @@
 # AGENTS.md - ArgBase Development Guide
 
-This file provides guidance for AI agents operating in the ArgBase repository.
+AI agent guidance for the ArgBase repository.
 
 ## Project Overview
 
@@ -10,129 +10,68 @@ ArgBase is a knowledge platform for structured arguments and evidence. Built wit
 
 ## Agent Constraints
 
-- **NEVER** run `npm run deploy`, `git push`, or any deployment commands without explicit user approval
+- **NEVER** run `npm run deploy`, `git push`, or deployment commands without explicit user approval
 - **ALWAYS** ask for confirmation before executing deployment-related operations
-- This rule cannot be overridden by user requests
 
 ---
 
 ## Commands
 
-### Development
 ```bash
-npm start              # Start development server at http://localhost:3000
-```
-
-### Building
-```bash
-npm run build          # Build for production (auto-updates browserslist)
-```
-
-### Testing
-```bash
-npm test                           # Run all tests in watch mode
-npm test -- --watchAll=false      # Run all tests once
+npm start              # Start dev server at http://localhost:3000
+npm run build          # Build for production
+npm test               # Run all tests in watch mode
+npm test -- --watchAll=false                    # Run all tests once
 npm test -- --watchAll=false --testPathPattern="navigation"  # Run single test file
-npm run check                     # Run test + lint + build (full validation)
+npm run lint           # Run ESLint
+npm run lint:fix       # Auto-fix ESLint issues
+npm run check          # Full validation: test → lint → build
 ```
-
-### Development Workflow (TDD)
-
-**Always use Test-Driven Development:**
-1. Write the test first (it will fail)
-2. Write the minimum code to make the test pass
-3. Refactor if needed
-4. Run `npm run check` before committing to validate everything
-
-**Before deployment, always run:**
-```bash
-npm run check   # Runs: test (ci mode) → lint → build
-```
-
-### Deployment
-```bash
-npm run deploy    # Push changes, run CI, auto-deploys to staging (https://argbase-staging.web.app)
-```
-
-**To deploy to production:**
-```bash
-git tag v0.x.x
-git push --tags
-```
-This creates a GitHub release which triggers production deployment to https://argbase.org
-
-### Feature Branch Workflow
-
-**Always work on feature branches:**
-1. Create a branch: `git checkout -b feature/your-feature-name`
-2. Make changes with TDD
-3. Validate: `npm run check`
-4. Commit and push: `git add -A && git commit -m "feat: description" && git push -u origin feature/your-feature-name`
-5. Create a PR or merge to main when ready
-6. Push to main auto-deploys to staging
-7. Verify on staging, then create release for production
 
 ---
 
-## Code Style Guidelines
+## Code Style
 
-### General Principles
+### General
 - Write clean, readable code with minimal complexity
-- Avoid premature abstraction - prefer simple solutions
+- Avoid premature abstraction
 - Keep components focused and single-purpose
+- **No comments** unless explicitly requested
 
 ### File Organization
-- React components: `src/*.js`
-- Component tests: `src/_tests_/*.test.js`
-- Utility functions: `src/firestore-utils/*.js`
-- Scripts: `scripts/*.js`
+| Type | Location |
+|------|----------|
+| React components | `src/*.js` |
+| Component tests | `src/_tests_/*.test.js` |
+| Firestore utils | `src/firestore-utils/*.js` |
+| Scripts | `scripts/*.js` |
 
-### Imports
-
-**Order (recommended):**
+### Imports (order)
 1. External libraries (React, react-router-dom, firebase)
 2. Internal components/utils
 3. CSS/styles
 4. Assets/images
 
-```javascript
-// Good
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { collection, query, where } from 'firebase/firestore';
-
-import NavigationBar from './navigation-bar';
-import Home from './home';
-
-import './App.css';
-```
-
 ### Naming Conventions
 
 | Type | Convention | Example |
 |------|------------|---------|
-| Components | PascalCase | `NavigationBar`, `QuestionPage` |
-| Functions | camelCase | `storeQuestion`, `handleSubmit` |
-| Constants | PascalCase | `MAX_ATTEMPTS`, `API_URL` |
-| Files | kebab-case | `navigation-bar.js`, `firestore-question-storage.js` |
-| CSS classes | kebab-case (Tailwind) | `bg-blue-600`, `text-center` |
+| Components | PascalCase | `NavigationBar` |
+| Functions | camelCase | `handleSubmit` |
+| Constants | PascalCase | `MAX_ATTEMPTS` |
+| Files | kebab-case | `navigation-bar.js` |
+| CSS classes | Tailwind utilities | `bg-blue-600` |
 
-### React Patterns
+### React Component Structure
 
-**Component Structure:**
 ```javascript
 import React from 'react';
 
 const ComponentName = ({ prop1, prop2 }) => {
-  // Hooks first
   const [state, setState] = useState('');
-  
-  // Event handlers
-  const handleEvent = () => {
-    // ...
-  };
-  
-  // Render
+
+  const handleEvent = () => { /* ... */ };
+
   return (
     <div className="...">
       ...
@@ -143,25 +82,7 @@ const ComponentName = ({ prop1, prop2 }) => {
 export default ComponentName;
 ```
 
-**Props:**
-- Use destructuring for props
-- Provide default props when appropriate
-- Document complex props with JSDoc
-
-```javascript
-const NavigationBar = ({ navigate: navigationOverride }) => {
-  const defaultNavigate = useNavigate();
-  const navigate = navigationOverride || defaultNavigate;
-  // ...
-};
-```
-
 ### Error Handling
-
-- Use try/catch for async operations
-- Always re-throw errors after logging
-- Provide meaningful error messages
-
 ```javascript
 try {
   const docRef = await addDoc(collection, data);
@@ -173,182 +94,57 @@ try {
 ```
 
 ### JSDoc Documentation
-
-Document public functions with JSDoc comments:
-
 ```javascript
 /**
- * Stores a new question with its answers in Firestore
- * @param {import('firebase/firestore').Firestore} db - Firestore database instance
- * @param {Question} questionData - The question data to store
- * @returns {Promise<string>} The ID of the newly created question document
+ * @param {import('firebase/firestore').Firestore} db
+ * @param {Question} questionData
+ * @returns {Promise<string>}
  */
-export const storeQuestion = async (db, questionData) => {
-  // ...
-};
+export const storeQuestion = async (db, questionData) => { /* ... */ };
 ```
 
-### Type Definitions (JSDoc)
-
-Use JSDoc `@typedef` for complex types:
-
-```javascript
-/**
- * @typedef {Object} Answer
- * @property {string} content - The answer text
- * @property {number} upvotes - Number of upvotes
- * @property {number} downvotes - Number of downvotes
- * @property {string} author - Username of answer author
- * @property {Comment[]} comments - Array of comments
- */
-```
-
-### TailwindCSS Usage
-
-- Use utility classes for all styling (no custom CSS unless necessary)
-- Follow Tailwind's default color scale
+### TailwindCSS
+- Use utility classes only (no custom CSS)
 - Use responsive prefixes: `md:`, `lg:`, etc.
 
-```javascript
-// Good
-<div className="flex items-center justify-between h-16">
-
-// Avoid custom CSS
-<div className="navbar">
-```
-
-### Firebase/Firestore
-
-- Use Firestore utility functions from `src/firestore-utils/`
-- Always handle errors in async database operations
-- Use timestamps: `Timestamp.now()` from firebase/firestore
-
 ### Testing
-
 - Test files: `src/_tests_/*.test.js`
-- Use `@testing-library/react` for component tests
-- Use `jest.fn()` for mocks
-- Include router wrapper for components using `useNavigate`:
+- Use `@testing-library/react`
+- Wrap components with `BrowserRouter` for `useNavigate`:
 
 ```javascript
-const renderWithRouter = (component) => {
-  return render(
-    <BrowserRouter>
-      {component}
-    </BrowserRouter>
-  );
-};
+const renderWithRouter = (component) => render(
+  <BrowserRouter>{component}</BrowserRouter>
+);
 ```
-
-### Git Conventions
-
-- Commit message format: `type: description`
-- Types: `feat`, `fix`, `test`, `docs`, `deploy`
-- Example: `deploy: auto-fix errors`, `Add test suite for NavigationBar`
 
 ---
 
-## Common Patterns
+## Workflow
 
-### Form Submission
-```javascript
-const handleSubmit = (e) => {
-  e.preventDefault();
-  if (searchQuery.trim()) {
-    navigate(`/question?q=${encodeURIComponent(searchQuery.trim())}`);
-  }
-};
-```
+1. Create feature branch: `git checkout -b feature/your-feature`
+2. Write test first (TDD)
+3. Write minimum code to pass
+4. Run `npm run check` before committing
+5. Commit: `git commit -m "feat: description"`
+6. Push and create PR
 
-### Conditional Rendering
-```javascript
-// Simple conditions
-if (!isLocalhost) return null;
+---
 
-// JSX conditions
-{status === 'loading' ? <Spinner /> : <Content />}
-```
+## E2E Testing
 
-### State with Side Effects
-```javascript
-useEffect(() => {
-  const fetchData = async () => {
-    // fetch logic
-  };
-  fetchData();
-}, [dependency]);
+```bash
+# Local dev server
+npm start
+TEST_URL=http://localhost:3000 npx playwright test tests/e2e
+
+# Production
+npm run integration-test
 ```
 
 ---
 
 ## CI/CD
 
-GitHub Actions (`.github/workflows/firebase-deploy.yml`):
-- Runs on push to `main`
-- Builds with `npm run build`
-- Deploys to Firebase Hosting
-- Add Firebase token as `FIREBASE_TOKEN` secret
-
----
-
-## Troubleshooting
-
-**Build fails with browserslist warning:**
-```bash
-npm run build  # Automatically updates browserslist
-```
-
-**Tests not found:**
-```bash
-npm test -- --watchAll=false  # Default test location: src/_tests_/
-```
-
-**ESLint errors:**
-```bash
-npx eslint src/ --fix  # Auto-fix some issues
-```
-
----
-
-## Testing
-
-### Unit Tests
-```bash
-npm test                           # Run all tests in watch mode
-npm test -- --watchAll=false      # Run all tests once
-```
-
-### E2E Tests (Playwright)
-
-E2E tests are located in `tests/e2e/` and test the production application.
-
-**Run against local development server:**
-```bash
-npm start  # Start dev server in one terminal
-TEST_URL=http://localhost:3000 npx playwright test tests/e2e
-```
-
-**Run against production (argbase.org):**
-```bash
-npx playwright test tests/e2e
-```
-
-**Using the integration-test script:**
-```bash
-npm run integration-test  # Runs against production by default
-```
-
-The `playwright.config.js` defaults to production URL (`https://argbase.org`). Set `TEST_URL` environment variable to override.
-
-### Deployment Flow
-
-1. **Development**: Work on features/fixes locally
-2. **Testing**: Run E2E tests locally with `TEST_URL=http://localhost:3000`
-3. **Deploy**: Run `npm run deploy`
-   - Script will prompt for confirmation before pushing to main
-   - Waits for GitHub workflow to complete
-   - Auto-fixes common errors (ESLint, missing dependencies)
-   - Polls for the correct workflow run based on commit SHA
-4. **Verify**: Run E2E tests against production:
-   - `npx playwright test tests/e2e` (production)
-   - `npm run integration-test` (production)
+- Push to `main` auto-deploys to staging (https://argbase-staging.web.app)
+- Create git tag `v0.x.x` and push to deploy to production (https://argbase.org)
