@@ -14,10 +14,10 @@
 - **Production environment** - Release-based manual deploy
 - **Environment banners** - Visual distinction between staging/production
 - **ADR documentation** - Decision record for automation workflow
-- **Enhanced security audit** - Dependabot + CodeQL
+- **Enhanced security audit** - Dependabot + CodeQL + Security workflow + eslint-plugin-security
 
 ### 🔲 Next
-- **Enhanced security audit** - Beyond npm audit (Snyk, Dependabot alerts, etc.)
+- (none)
 
 ---
 
