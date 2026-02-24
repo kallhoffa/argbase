@@ -193,7 +193,6 @@ const Component = () => {
 | File | Purpose |
 |------|---------|
 | `.env.example` | Template with placeholder values |
-| `.env.staging` | Staging config (committed) |
 | `.env.local` | Local overrides (gitignored) - use for emulator or staging |
 
 **Local Development:**
