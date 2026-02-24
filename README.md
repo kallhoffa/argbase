@@ -39,7 +39,23 @@ ArgBase serves as a centralized repository of structured arguments, evidence, an
 - Node.js
 - TailwindCSS
 - React Router
-- [Additional technologies to be added]
+- Firebase (Auth + Firestore)
+
+## Commands
+
+```bash
+npm run dev           # Start dev server at http://localhost:5173
+npm run build         # Build for production
+npm run preview       # Preview production build
+npm test              # Run unit tests in watch mode
+npm run test:ci       # Run unit tests once (CI mode)
+npm run lint          # Run ESLint
+npm run lint:fix      # Auto-fix ESLint issues
+npm run check         # Full validation: test → lint → build
+npm run harden        # Pre-deploy security checks
+npm run deploy        # Deploy to staging (auto on push to main)
+npm run integration-test  # Run E2E tests on staging
+```
 
 ## Getting Started
 
@@ -61,15 +77,22 @@ cd argbase
 npm install
 
 # Start development server
-npm start
+npm run dev
 ```
 
 ### Development Setup
 
-1. Copy `.env.example` to `.env`
-2. Configure your environment variables
+1. Copy `.env` to `.env.local` and configure your Firebase credentials
+2. For local development with emulators:
+   ```bash
+   firebase emulators:start
+   ```
 3. Start the development server
-4. Visit `http://localhost:3000`
+4. Visit `http://localhost:5173`
+5. Run hardening checks before committing:
+   ```bash
+   npm run harden
+   ```
 
 ## Contributing
 

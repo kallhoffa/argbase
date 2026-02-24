@@ -18,14 +18,16 @@ ArgBase is a knowledge platform for structured arguments and evidence. Built wit
 ## Commands
 
 ```bash
-npm start              # Start dev server at http://localhost:3000
-npm run build          # Build for production
-npm test               # Run all tests in watch mode
-npm test -- --watchAll=false                    # Run all tests once
-npm test -- --watchAll=false --testPathPattern="navigation"  # Run single test file
-npm run lint           # Run ESLint
-npm run lint:fix       # Auto-fix ESLint issues
-npm run check          # Full validation: test → lint → build
+npm run dev          # Start dev server at http://localhost:5173
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm test            # Run unit tests in watch mode
+npm run test:ci     # Run all tests once
+npm run lint        # Run ESLint
+npm run lint:fix    # Auto-fix ESLint issues
+npm run check       # Full validation: test → lint → build
+npm run harden       # Pre-deploy security and quality checks
+npm run deploy      # Deploy to staging
 ```
 
 ---
@@ -148,3 +150,48 @@ npm run integration-test
 
 - Push to `main` auto-deploys to staging (https://argbase-staging.web.app)
 - Create git tag `v0.x.x` and push to deploy to production (https://argbase.org)
+
+---
+
+## Firebase Auth
+
+Firebase Auth is configured for the application. To add authentication to components:
+
+```javascript
+import { useAuth } from './firestore-utils/auth-context';
+
+const Component = () => {
+  const { user, login, logout } = useAuth();
+  
+  if (user) {
+    return <div>Logged in as {user.email}</div>;
+  }
+  
+  return <button onClick={login}>Log In</button>;
+};
+```
+
+### Local Development with Emulators
+
+1. Start Firebase emulators:
+   ```bash
+   firebase emulators:start
+   ```
+
+2. Create `.env.local` with:
+   ```
+   VITE_USE_FIREBASE_EMULATOR=true
+   ```
+
+3. Start dev server:
+   ```bash
+   npm run dev
+   ```
+
+### Environment Files
+
+| File | Purpose |
+|------|---------|
+| `.env` | Production defaults (committed) |
+| `.env.staging` | Staging config (committed) |
+| `.env.local` | Local overrides (gitignored) |

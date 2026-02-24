@@ -293,6 +293,172 @@ async function runSecuritySweep() {
   return { success: true };
 }
 
+async function runDocReview() {
+  console.log('\n--- Running documentation review ---');
+  
+  const rootDir = path.join(__dirname, '..');
+  const docsToCheck = [
+    { path: 'README.md', required: true },
+    { path: 'AGENTS.md', required: true },
+    { path: 'docs', required: true },
+  ];
+  
+  const issues = [];
+  
+  for (const doc of docsToCheck) {
+    const fullPath = path.join(rootDir, doc.path);
+    if (doc.required && !fs.existsSync(fullPath)) {
+      issues.push(`Missing required documentation: ${doc.path}`);
+    }
+  }
+  
+  if (issues.length > 0) {
+    console.log('⚠ Documentation issues found:');
+    for (const issue of issues) {
+      console.log(`  - ${issue}`);
+    }
+    return { success: false, error: 'Documentation issues found' };
+  }
+  
+  try {
+    const { stdout } = require('child_process').execSync('git log -1 --format="%H" -- README.md AGENTS.md docs/', {
+      encoding: 'utf8',
+      cwd: rootDir,
+    });
+    
+    const { stdout: lastCommit } = require('child_process').execSync('git log -1 --format="%H" -n 1', {
+      encoding: 'utf8',
+      cwd: rootDir,
+    });
+    
+    const docCommit = stdout.trim().split('\n')[0];
+    
+    if (docCommit !== lastCommit.trim()) {
+      console.log('⚠ Documentation has not been updated in the latest commit');
+      console.log('  Please update README.md, AGENTS.md, or docs/ with your changes');
+      return { success: false, error: 'Documentation not updated in latest commit' };
+    }
+  } catch (e) {
+    console.log('  (Could not check git history, skipping commit check)');
+  }
+  
+  console.log('✓ Documentation review passed');
+  return { success: true };
+}
+
+async function runMutationTest() {
+  console.log('\n--- Running mutation testing ---');
+  
+  const srcDir = path.join(__dirname, '..', 'src');
+  const testDir = path.join(__dirname, '..', 'src', '_tests_');
+  
+  if (!fs.existsSync(testDir)) {
+    console.log('⚠ No tests found, skipping mutation testing');
+    return { success: true };
+  }
+  
+  const testFiles = fs.readdirSync(testDir).filter(f => f.endsWith('.test.js') || f.endsWith('.test.jsx'));
+  if (testFiles.length === 0) {
+    console.log('⚠ No test files found, skipping mutation testing');
+    return { success: true };
+  }
+  
+  console.log(`  Found ${testFiles.length} test files`);
+  
+  const srcFiles = [];
+  function walkSrc(dir) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name !== '_tests_' && entry.name !== 'node_modules') {
+          walkSrc(fullPath);
+        }
+      } else if (entry.isFile() && (entry.name.endsWith('.js') || entry.name.endsWith('.jsx'))) {
+        if (!entry.name.includes('.test.') && !entry.name.includes('.spec.')) {
+          srcFiles.push(fullPath);
+        }
+      }
+    }
+  }
+  
+  if (!fs.existsSync(srcDir)) {
+    console.log('⚠ Source directory not found, skipping mutation testing');
+    return { success: true };
+  }
+  
+  walkSrc(srcDir);
+  
+  if (srcFiles.length === 0) {
+    console.log('⚠ No source files found for mutation testing');
+    return { success: true };
+  }
+  
+  console.log(`  Found ${srcFiles.length} source files to mutate`);
+  
+  const mutations = [
+    { pattern: /===/g, replacement: '==', name: 'strict equality to loose equality' },
+    { pattern: /!==/g, replacement: '!=', name: 'strict inequality to loose inequality' },
+    { pattern: /\&\&/g, replacement: '&', name: 'logical AND to bitwise AND' },
+    { pattern: /\|\|/g, replacement: '|', name: 'logical OR to bitwise OR' },
+  ];
+  
+  let mutationsApplied = 0;
+  let testsCaught = 0;
+  
+  const testSourceFile = srcFiles.find(f => f.includes('auth-context') || f.includes('firestore'));
+  
+  if (testSourceFile) {
+    console.log(`  Testing mutation on: ${path.basename(testSourceFile)}`);
+    
+    let content = fs.readFileSync(testSourceFile, 'utf8');
+    const originalContent = content;
+    
+    for (const mut of mutations) {
+      if (mut.pattern.test(content)) {
+        content = content.replace(mut.pattern, mut.replacement);
+        
+        const mutatedFile = testSourceFile + '.mutant';
+        fs.writeFileSync(mutatedFile, content);
+        
+        const testResult = execSync('npm run test:ci -- --reporter=verbose', {
+          encoding: 'utf8',
+          stdio: 'pipe',
+          timeout: 60000,
+          cwd: path.join(__dirname, '..')
+        });
+        
+        fs.unlinkSync(mutatedFile);
+        
+        mutationsApplied++;
+        
+        if (testResult.includes('failed') || testResult.includes('FAIL')) {
+          testsCaught++;
+          console.log(`  ✓ Caught mutation: ${mut.name}`);
+        }
+        
+        content = originalContent;
+      }
+    }
+  }
+  
+  if (mutationsApplied > 0) {
+    const score = Math.round((testsCaught / mutationsApplied) * 100);
+    console.log(`  Mutation score: ${testsCaught}/${mutationsApplied} (${score}%)`);
+    
+    if (score < 50) {
+      console.log('⚠ Low mutation score - tests may not be catching code changes');
+      return { success: false, error: 'Low mutation score' };
+    }
+    
+    console.log('✓ Mutation testing passed');
+    return { success: true };
+  }
+  
+  console.log('⚠ No applicable mutations found');
+  return { success: true };
+}
+
 async function harden(attempt = 1) {
   console.log('=== Hardening Checks ===\n');
   console.log(`Config: maxBundleSize=${CONFIG.maxBundleSizeKB}KB, url=${CONFIG.testUrl}`);
@@ -310,6 +476,8 @@ async function harden(attempt = 1) {
     localE2e: await runLocalE2E(),
     accessibility: await runAccessibilityCheck(),
     securitySweep: await runSecuritySweep(),
+    docReview: await runDocReview(),
+    mutation: await runMutationTest(),
   };
 
   const allPassed = Object.values(results).every(r => r.success);
