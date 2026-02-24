@@ -8,7 +8,7 @@ test.describe('Question Page', () => {
 
   test('should have navigation bar', async ({ page }) => {
     await page.goto('/question?q=test');
-    await expect(page.locator('nav')).toBeVisible();
+    await expect(page.getByRole('navigation').first()).toBeVisible();
   });
 
   test('should handle question not found or error gracefully', async ({ page }) => {

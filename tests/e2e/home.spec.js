@@ -10,24 +10,23 @@ test.describe('Home Page', () => {
   });
 
   test('should display the logo and tagline', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('ArgBase');
-    await expect(page.locator('text=Every question answered')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'ArgBase' })).toBeVisible();
+    await expect(page.getByText('Every question answered')).toBeVisible();
   });
 
   test('should have a search input', async ({ page }) => {
-    const searchInput = page.locator('input[type="text"]');
+    const searchInput = page.getByRole('navigation').getByRole('textbox', { name: 'What would you like to know?' });
     await expect(searchInput).toBeVisible();
-    await expect(searchInput).toHaveAttribute('placeholder', 'What would you like to know?');
   });
 
   test('should navigate to question page on search', async ({ page }) => {
-    const searchInput = page.locator('input[type="text"]');
+    const searchInput = page.getByRole('navigation').getByRole('textbox', { name: 'What would you like to know?' });
     await searchInput.fill('What is gravity?');
     await searchInput.press('Enter');
     await expect(page).toHaveURL(/question\?q=What.*gravity/);
   });
 
   test('should have footer info text', async ({ page }) => {
-    await expect(page.locator('text=Join us in building the world\'s knowledge base')).toBeVisible();
+    await expect(page.getByText('Join us in building the world\'s knowledge base')).toBeVisible();
   });
 });
