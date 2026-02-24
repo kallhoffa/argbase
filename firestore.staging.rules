@@ -1,30 +1,9 @@
-{
-  "rules": {
-    "collections": {
-      "questions": {
-        "read": { "allow": true },
-        "write": { "allow": true }
-      },
-      "arguments": {
-        "read": { "allow": true },
-        "write": { "allow": true }
-      },
-      "categories": {
-        "read": { "allow": true },
-        "write": { "allow": true }
-      },
-      "argument_categories": {
-        "read": { "allow": true },
-        "write": { "allow": true }
-      },
-      "links": {
-        "read": { "allow": true },
-        "write": { "allow": true }
-      },
-      "users": {
-        "read": { "allow": true },
-        "write": { "allow": true }
-      }
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }
