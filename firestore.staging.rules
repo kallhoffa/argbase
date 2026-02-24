@@ -1,0 +1,30 @@
+{
+  "rules": {
+    "collections": {
+      "questions": {
+        "read": { "allow": true },
+        "write": { "allow": true }
+      },
+      "arguments": {
+        "read": { "allow": true },
+        "write": { "allow": true }
+      },
+      "categories": {
+        "read": { "allow": true },
+        "write": { "allow": true }
+      },
+      "argument_categories": {
+        "read": { "allow": true },
+        "write": { "allow": true }
+      },
+      "links": {
+        "read": { "allow": true },
+        "write": { "allow": true }
+      },
+      "users": {
+        "read": { "allow": true },
+        "write": { "allow": true }
+      }
+    }
+  }
+}

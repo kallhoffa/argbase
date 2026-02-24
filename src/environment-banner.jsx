@@ -17,7 +17,7 @@ const EnvironmentBanner = () => {
 
   if (isStaging) {
     return (
-      <div className="bg-orange-500 text-center p-2 text-white font-medium fixed w-full top-0 z-[100]">
+      <div className="bg-orange-500 text-center p-2 text-white font-medium fixed w-full bottom-0 z-[100]">
         STAGING ENVIRONMENT - Not Production
       </div>
     );

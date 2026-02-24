@@ -1,19 +1,40 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './firestore-utils/auth-context';
 
 const NavigationBar = ({ navigate: navigationOverride }) => {
   const defaultNavigate = useNavigate();
   const navigate = navigationOverride || defaultNavigate;
   const [searchQuery, setSearchQuery] = useState('');
+  const { user, login, logout } = useAuth();
   
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      if (searchQuery.trim()) {
-        // Navigate to answer page with search query as parameter
-        navigate(`/question?q=${encodeURIComponent(searchQuery.trim())}`);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/question?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleLogin = async () => {
+    const email = prompt('Enter email:');
+    const password = prompt('Enter password:');
+    if (email && password) {
+      try {
+        await login(email, password);
+      } catch (error) {
+        alert('Login failed: ' + error.message);
       }
-    };
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      alert('Logout failed: ' + error.message);
+    }
+  };
   
     return (
       <nav className="bg-white border-b border-gray-200 fixed w-full top-0 z-50">
@@ -48,17 +69,35 @@ const NavigationBar = ({ navigate: navigationOverride }) => {
               </div>
             </form>
   
-            {/* Right side menu/buttons if needed */}
+            {/* Right side menu/buttons */}
             <div className="flex items-center space-x-4">
               <a href="/about" className="text-gray-600 hover:text-blue-600 text-sm font-medium">
                 About
               </a>
-              <button className="text-gray-600 hover:text-blue-600 text-sm font-medium">
-                Log In
-              </button>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700">
-                Sign Up
-              </button>
+              {user ? (
+                <>
+                  <span className="text-sm text-gray-600">{user.email}</span>
+                  <button 
+                    onClick={handleLogout}
+                    className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 text-sm font-medium"
+                  >
+                    <LogOut size={16} />
+                    <span>Logout</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    onClick={handleLogin}
+                    className="text-gray-600 hover:text-blue-600 text-sm font-medium"
+                  >
+                    Log In
+                  </button>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700">
+                    Sign Up
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

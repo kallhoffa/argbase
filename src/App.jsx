@@ -7,13 +7,17 @@ import Home from './home';
 import ComposeAnswer from './compose-answer';
 import EnvironmentBanner from './environment-banner';
 import About from './about';
+import NavigationBar from './navigation-bar';
 
 
 const RootLayout = () => {
   return (
     <>
       <EnvironmentBanner />
-      <Outlet />
+      <NavigationBar />
+      <div className="pt-16">
+        <Outlet />
+      </div>
     </>
   );
 };

@@ -1,17 +1,37 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from '../firestore-utils/auth-context';
 import NavigationBar from '../navigation-bar';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+
+vi.mock('firebase/auth', () => ({
+  onAuthStateChanged: vi.fn(),
+  signInWithEmailAndPassword: vi.fn(),
+  signOut: vi.fn(),
+}));
+
+const mockAuth = {};
 
 const renderWithRouter = (component) => {
   return render(
     <BrowserRouter>
-      {component}
+      <AuthProvider auth={mockAuth}>
+        {component}
+      </AuthProvider>
     </BrowserRouter>
   );
 };
 
 describe('NavigationBar', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    onAuthStateChanged.mockImplementation((auth, callback) => {
+      callback(null);
+      return vi.fn();
+    });
+  });
+
   test('renders logo with correct text', () => {
     renderWithRouter(<NavigationBar />);
     expect(screen.getByText('Arg')).toBeInTheDocument();
