@@ -192,6 +192,20 @@ const Component = () => {
 
 | File | Purpose |
 |------|---------|
-| `.env` | Production defaults (committed) |
+| `.env.example` | Template with placeholder values |
 | `.env.staging` | Staging config (committed) |
-| `.env.local` | Local overrides (gitignored) |
+| `.env.local` | Local overrides (gitignored) - use for emulator or staging |
+
+**Local Development:**
+```bash
+# Recommended: Use emulators
+cp .env.example .env.local
+firebase emulators:start  # Terminal 1
+npm run dev               # Terminal 2
+```
+
+**Testing against staging:**
+```bash
+# Copy staging config to local
+cp .env.staging .env.local
+```

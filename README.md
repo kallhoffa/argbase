@@ -82,17 +82,38 @@ npm run dev
 
 ### Development Setup
 
-1. Copy `.env` to `.env.local` and configure your Firebase credentials
-2. For local development with emulators:
+**Recommended: Use Firebase Emulators (file-based local DB)**
+
+1. Install Firebase CLI if needed: `npm install -g firebase-tools`
+2. Copy `.env.example` to `.env.local`:
+   ```bash
+   cp .env.example .env.local
+   ```
+3. Start emulators (runs Firestore + Auth locally):
    ```bash
    firebase emulators:start
    ```
-3. Start the development server
-4. Visit `http://localhost:5173`
-5. Run hardening checks before committing:
+4. In another terminal, start dev server:
    ```bash
-   npm run harden
+   npm run dev
    ```
+5. Visit `http://localhost:5173`
+
+**Why use emulators?**
+- File-based Firestore (no cloud costs)
+- Create any test users locally
+- No risk of corrupting staging/production data
+
+**Alternative: Connect to staging**
+
+If you want to test against staging instead:
+1. Copy `.env.staging` to `.env.local` (get values from staging Firebase console)
+2. Set `VITE_USE_FIREBASE_EMULATOR=false` in `.env.local`
+
+**Before committing:**
+```bash
+npm run harden
+```
 
 ## Contributing
 
