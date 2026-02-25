@@ -48,9 +48,9 @@ describe('NavigationBar', () => {
     expect(screen.getByText('About')).toBeInTheDocument();
   });
 
-  test('renders Log In button', () => {
+  test('renders Sign In button', () => {
     renderWithRouter(<NavigationBar />);
-    expect(screen.getByText('Log In')).toBeInTheDocument();
+    expect(screen.getByText('Sign In')).toBeInTheDocument();
   });
 
   test('renders Sign Up button', () => {

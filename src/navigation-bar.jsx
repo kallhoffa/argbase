@@ -7,24 +7,12 @@ const NavigationBar = ({ navigate: navigationOverride }) => {
   const defaultNavigate = useNavigate();
   const navigate = navigationOverride || defaultNavigate;
   const [searchQuery, setSearchQuery] = useState('');
-  const { user, login, logout } = useAuth();
+  const { user, logout } = useAuth();
   
   const handleSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/question?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
-
-  const handleLogin = async () => {
-    const email = prompt('Enter email:');
-    const password = prompt('Enter password:');
-    if (email && password) {
-      try {
-        await login(email, password);
-      } catch (error) {
-        alert('Login failed: ' + error.message);
-      }
     }
   };
 
@@ -88,12 +76,15 @@ const NavigationBar = ({ navigate: navigationOverride }) => {
               ) : (
                 <>
                   <button 
-                    onClick={handleLogin}
-                    className="text-gray-600 hover:text-blue-600 text-sm font-medium"
+                    onClick={() => navigate('/login')}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700"
                   >
-                    Log In
+                    Sign In
                   </button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700">
+                  <button 
+                    onClick={() => navigate('/signup')}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700"
+                  >
                     Sign Up
                   </button>
                 </>

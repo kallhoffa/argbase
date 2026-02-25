@@ -8,6 +8,8 @@ import ComposeAnswer from './compose-answer';
 import EnvironmentBanner from './environment-banner';
 import About from './about';
 import NavigationBar from './navigation-bar';
+import Login from './login';
+import Signup from './signup';
 
 
 const RootLayout = () => {
@@ -33,6 +35,8 @@ function App({ db }) {
           <Route path="/question" element={<QuestionPage db={db}/>} />
           <Route path="/compose-answer" element={<ComposeAnswer db={db} />} />
           <Route path="/about" element={<About/>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Route>
       </Routes>
     </BrowserRouter>

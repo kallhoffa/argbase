@@ -2,12 +2,15 @@ import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider, useAuth } from '../firestore-utils/auth-context';
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 vi.mock('firebase/auth', () => ({
   signInWithEmailAndPassword: vi.fn(),
   signOut: vi.fn(),
   onAuthStateChanged: vi.fn(),
+  createUserWithEmailAndPassword: vi.fn(),
+  signInWithPopup: vi.fn(),
+  GoogleAuthProvider: vi.fn(),
 }));
 
 const mockAuth = {};
@@ -23,13 +26,15 @@ const renderWithAuth = (component) => {
 };
 
 const TestComponent = () => {
-  const { user, loading, login, logout } = useAuth();
+  const { user, loading, login, logout, signup, loginWithGoogle } = useAuth();
   return (
     <div>
       <span data-testid="loading">{loading ? 'loading' : 'not-loading'}</span>
       <span data-testid="user">{user ? user.email : 'no-user'}</span>
       <button onClick={() => login('test@test.com', 'password')}>Login</button>
       <button onClick={() => logout()}>Logout</button>
+      <button onClick={() => signup('test@test.com', 'password')}>Signup</button>
+      <button onClick={() => loginWithGoogle()}>GoogleLogin</button>
     </div>
   );
 };
@@ -104,5 +109,37 @@ describe('AuthProvider', () => {
     }).toThrow('useAuth must be used within an AuthProvider');
     
     consoleError.mockRestore();
+  });
+
+  test('signup calls createUserWithEmailAndPassword', async () => {
+    onAuthStateChanged.mockImplementation(() => vi.fn());
+    createUserWithEmailAndPassword.mockResolvedValue({ user: { email: 'test@test.com' } });
+
+    renderWithAuth(<TestComponent />);
+    
+    await screen.findByTestId('loading');
+    await screen.findByTestId('user');
+
+    fireEvent.click(screen.getByText('Signup'));
+    
+    await waitFor(() => {
+      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(mockAuth, 'test@test.com', 'password');
+    });
+  });
+
+  test('loginWithGoogle calls signInWithPopup', async () => {
+    onAuthStateChanged.mockImplementation(() => vi.fn());
+    signInWithPopup.mockResolvedValue({ user: { email: 'test@gmail.com' } });
+
+    renderWithAuth(<TestComponent />);
+    
+    await screen.findByTestId('loading');
+    await screen.findByTestId('user');
+
+    fireEvent.click(screen.getByText('GoogleLogin'));
+    
+    await waitFor(() => {
+      expect(signInWithPopup).toHaveBeenCalledWith(mockAuth, expect.any(GoogleAuthProvider));
+    });
   });
 });

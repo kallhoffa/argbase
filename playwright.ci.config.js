@@ -5,7 +5,7 @@ export default defineConfig({
   timeout: 30000,
   retries: 1,
   use: {
-    baseURL: process.env.TEST_URL || 'http://localhost:3000',
+    baseURL: 'https://argbase-staging.web.app',
     trace: 'on-first-retry',
     headless: true,
   },
@@ -15,12 +15,4 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: process.env.CI ? undefined : {
-    command: 'npm run dev:emulator',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  },
 });
