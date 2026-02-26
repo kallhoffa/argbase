@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@sentry/react": "^10.40.0",
     "firebase": "^11.0.1",
     "lucide-react": "^0.454.0",
     "react": "^19.2.4",
@@ -18,7 +19,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ci": "vitest run",
+    "test:ci": "vitest run --pool=threads",
+    "test:ci:coverage": "vitest run --pool=threads --coverage",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "check": "npm run test:ci && npm run lint && npm run build",
@@ -33,6 +35,8 @@
     "integration-test": "node scripts/integration-test.cjs",
     "e2e": "playwright test",
     "e2e:ci": "playwright test --config=playwright.ci.config.js",
+    "e2e:smoke": "playwright test tests/e2e/smoke.spec.js",
+    "e2e:smoke:ci": "playwright test tests/e2e/smoke.spec.js --config=playwright.ci.config.js",
     "prepare": "husky"
   },
   "eslintConfig": {
@@ -43,6 +47,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
+    "@sentry/vite-plugin": "^5.1.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
