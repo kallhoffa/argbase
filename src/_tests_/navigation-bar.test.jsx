@@ -11,6 +11,12 @@ vi.mock('firebase/auth', () => ({
   signOut: vi.fn(),
 }));
 
+vi.mock('../firestore-utils/remote-config', () => ({
+  fetchFeatureFlags: vi.fn().mockResolvedValue({
+    navigation_banner: 'control',
+  }),
+}));
+
 const mockAuth = {};
 
 const renderWithRouter = (component) => {
@@ -30,12 +36,35 @@ describe('NavigationBar', () => {
       callback(null);
       return vi.fn();
     });
+    delete window.__FEATURE_FLAGS__;
+    delete window.__FLAG_TEST_MODE__;
   });
 
-  test('renders logo with correct text', () => {
+  afterEach(() => {
+    delete window.__FEATURE_FLAGS__;
+    delete window.__FLAG_TEST_MODE__;
+  });
+
+  test('renders logo with control text (ArgBase)', async () => {
     renderWithRouter(<NavigationBar />);
-    expect(screen.getByText('Arg')).toBeInTheDocument();
-    expect(screen.getByText('Base')).toBeInTheDocument();
+    await screen.findByText('ArgBase');
+    expect(screen.getByText('ArgBase')).toBeInTheDocument();
+  });
+
+  test('renders logo with beta text (ArgBase (beta))', async () => {
+    window.__FEATURE_FLAGS__ = { navigation_banner: 'beta' };
+    
+    renderWithRouter(<NavigationBar />);
+    await screen.findByText('ArgBase (beta)');
+    expect(screen.getByText('ArgBase (beta)')).toBeInTheDocument();
+  });
+
+  test('renders logo with next text (ArgBase (beta))', async () => {
+    window.__FEATURE_FLAGS__ = { navigation_banner: 'next' };
+    
+    renderWithRouter(<NavigationBar />);
+    await screen.findByText('ArgBase (beta)');
+    expect(screen.getByText('ArgBase (beta)')).toBeInTheDocument();
   });
 
   test('renders search input', () => {

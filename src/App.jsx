@@ -10,6 +10,7 @@ import About from './about';
 import NavigationBar from './navigation-bar';
 import Login from './login';
 import Signup from './signup';
+import Profile from './profile';
 
 
 const RootLayout = () => {
@@ -30,13 +31,14 @@ function App({ db }) {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<RootLayout />}>
+          <Route element={<RootLayout />}>
           <Route path="/" element={<Home/>} />
           <Route path="/question" element={<QuestionPage db={db}/>} />
           <Route path="/compose-answer" element={<ComposeAnswer db={db} />} />
           <Route path="/about" element={<About/>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/profile" element={<Profile db={db} />} />
         </Route>
       </Routes>
     </BrowserRouter>

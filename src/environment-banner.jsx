@@ -20,7 +20,7 @@ const EnvironmentBanner = () => {
       production: 'bg-blue-600'
     };
     return (
-      <div className={`${colors[type]} text-center p-2 text-white font-medium fixed w-full bottom-0 z-[100]`}>
+      <div className={`${colors[type]} text-center p-2 text-white font-medium fixed w-full bottom-0 z-[9999] pb-6`}>
         {children}
       </div>
     );

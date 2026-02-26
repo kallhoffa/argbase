@@ -1,0 +1,40 @@
+{
+  "parameters": {
+    "navigation_banner": {
+      "defaultValue": {
+        "value": "control"
+      },
+      "description": "Navigation banner variant: control (ArgBase), beta (ArgBase beta for beta users), next (ArgBase beta for 10% bucket)"
+    }
+  },
+  "conditions": [
+    {
+      "name": "staging",
+      "expression": "country == 'staging'",
+      "tagColor": "BLUE"
+    },
+    {
+      "name": "beta_users",
+      "expression": "('beta_enabled' in userAttributes && userAttributes.beta_enabled == true)",
+      "tagColor": "GREEN"
+    },
+    {
+      "name": "ten_percent_bucket",
+      "expression": "device.randomPercent <= 10",
+      "tagColor": "ORANGE"
+    }
+  ],
+  "conditionalValues": {
+    "navigation_banner": {
+      "staging": {
+        "value": "beta"
+      },
+      "beta_users": {
+        "value": "beta"
+      },
+      "ten_percent_bucket": {
+        "value": "next"
+      }
+    }
+  }
+}

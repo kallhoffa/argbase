@@ -1,9 +1,11 @@
 const { execSync, exec } = require('child_process');
 const util = require('util');
 const path = require('path');
+const fs = require('fs');
 
 const execPromise = util.promisify(exec);
 
+const RC_CONFIG_PATH = path.join(__dirname, 'remote-config.json');
 const MAX_ATTEMPTS = 5;
 const POLL_INTERVAL_MS = 30000;
 
@@ -28,6 +30,142 @@ async function run(cmd, options = {}) {
   } catch (e) {
     return { stdout: e.stdout, stderr: e.stderr, error: e };
   }
+}
+
+async function getAccessToken() {
+  if (process.env.FIREBASE_TOKEN) {
+    return process.env.FIREBASE_TOKEN;
+  }
+  
+  try {
+    const token = execSync('firebase auth:export --format=JSON', { encoding: 'utf8' });
+    return JSON.parse(token).access_token;
+  } catch (e) {
+    throw new Error('Failed to get Firebase access token. Set FIREBASE_TOKEN env var or run "firebase login".');
+  }
+}
+
+async function getRemoteConfig(projectId) {
+  const token = await getAccessToken();
+  const url = `https://firebaseremoteconfig.googleapis.com/v1/projects/${projectId}/remoteConfig`;
+  
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to get Remote Config: ${error}`);
+  }
+  
+  return response.json();
+}
+
+async function setRemoteConfig(projectId, config) {
+  const token = await getAccessToken();
+  const url = `https://firebaseremoteconfig.googleapis.com/v1/projects/${projectId}/remoteConfig`;
+  
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(config)
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to set Remote Config: ${error}`);
+  }
+  
+  return response.json();
+}
+
+async function validateRemoteConfig(projectId) {
+  if (!fs.existsSync(RC_CONFIG_PATH)) {
+    throw new Error(`${RC_CONFIG_PATH} not found. Run "npm run remote-config:init" first.`);
+  }
+  
+  const localConfig = JSON.parse(fs.readFileSync(RC_CONFIG_PATH, 'utf8'));
+  const remoteConfig = await getRemoteConfig(projectId);
+  
+  const errors = [];
+  const localParams = localConfig.parameters || {};
+  const remoteParams = remoteConfig.parameters || {};
+  const localConditions = localConfig.conditions || [];
+  const remoteConditions = remoteConfig.conditions || [];
+  const localConditionalValues = localConfig.conditionalValues || {};
+  
+  for (const [paramKey, paramConfig] of Object.entries(localParams)) {
+    if (!remoteParams[paramKey]) {
+      errors.push(`Parameter "${paramKey}" is missing in Remote Config`);
+      continue;
+    }
+    
+    const remoteParam = remoteParams[paramKey];
+    const localDefault = paramConfig.defaultValue?.value;
+    const remoteDefault = remoteParam.defaultValue?.value;
+    
+    if (localDefault !== remoteDefault) {
+      errors.push(`Parameter "${paramKey}" has wrong default: expected "${localDefault}", got "${remoteDefault}"`);
+    }
+    
+    const localConditionals = localConditionalValues[paramKey] || {};
+    const remoteConditionals = remoteParam.conditionalValues || {};
+    
+    for (const conditionName of Object.keys(localConditionals)) {
+      if (!remoteConditionals[conditionName]) {
+        errors.push(`Parameter "${paramKey}" is missing condition "${conditionName}"`);
+      } else if (localConditionals[conditionName].value !== remoteConditionals[conditionName].value) {
+        errors.push(`Parameter "${paramKey}" condition "${conditionName}" has wrong value`);
+      }
+    }
+  }
+  
+  for (const localCond of localConditions) {
+    const remoteCond = remoteConditions.find(c => c.name === localCond.name);
+    if (!remoteCond) {
+      errors.push(`Condition "${localCond.name}" is missing in Remote Config`);
+    }
+  }
+  
+  return errors;
+}
+
+async function syncRemoteConfig(projectId) {
+  console.log('\n--- Syncing Remote Config ---');
+  
+  if (!fs.existsSync(RC_CONFIG_PATH)) {
+    throw new Error(`${RC_CONFIG_PATH} not found. Run "npm run remote-config:init" first.`);
+  }
+  
+  const config = JSON.parse(fs.readFileSync(RC_CONFIG_PATH, 'utf8'));
+  
+  const template = {
+    conditions: config.conditions || [],
+    parameters: config.parameters || {},
+  };
+  
+  if (config.conditionalValues) {
+    for (const [paramKey, conditions] of Object.entries(config.conditionalValues)) {
+      if (!template.parameters[paramKey]) {
+        template.parameters[paramKey] = { defaultValue: { value: 'control' } };
+      }
+      template.parameters[paramKey].conditionalValues = {};
+      for (const [conditionName, conditionValue] of Object.entries(conditions)) {
+        template.parameters[paramKey].conditionalValues[conditionName] = conditionValue;
+      }
+    }
+  }
+  
+  console.log(`Parameters: ${Object.keys(template.parameters).join(', ')}`);
+  
+  const result = await setRemoteConfig(projectId, template);
+  console.log(`✓ Remote Config published (version ${result.versionNumber})`);
 }
 
 async function getLatestRunId(commitSha) {
@@ -158,6 +296,19 @@ async function deploy(attempt = 1) {
     console.log('  git merge ' + branch);
     console.log('  git push');
     return false;
+  }
+
+  const projectId = isProduction ? 'argbase-prod' : 'argbase-staging';
+
+  console.log('\n--- Validating Remote Config ---');
+  const validationErrors = await validateRemoteConfig(projectId);
+  if (validationErrors.length > 0) {
+    console.log('✗ Remote Config validation failed:');
+    validationErrors.forEach(e => console.log(`  - ${e}`));
+    console.log('\nSyncing Remote Config...');
+    await syncRemoteConfig(projectId);
+  } else {
+    console.log('✓ Remote Config is valid');
   }
 
   if (isProduction) {

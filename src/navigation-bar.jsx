@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
-import { Search, LogOut } from 'lucide-react';
+import { Search, LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './firestore-utils/auth-context';
+import useFeatureFlag from './hooks/useFeatureFlag';
+import { BANNER_VARIANTS, isBannerVariant } from './config/featureFlags';
 
 const NavigationBar = ({ navigate: navigationOverride }) => {
   const defaultNavigate = useNavigate();
   const navigate = navigationOverride || defaultNavigate;
   const [searchQuery, setSearchQuery] = useState('');
   const { user, logout } = useAuth();
+  const { flagValue: bannerVariant, loading: bannerLoading } = useFeatureFlag('navigation_banner');
+  
+  const getBannerText = () => {
+    if (bannerLoading || !bannerVariant) return BANNER_VARIANTS.control;
+    if (isBannerVariant(bannerVariant)) return BANNER_VARIANTS.beta;
+    return BANNER_VARIANTS.control;
+  };
   
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,7 +40,7 @@ const NavigationBar = ({ navigate: navigationOverride }) => {
             {/* Logo */}
             <a href="/" className="flex items-center">
               <h1 className="text-2xl font-bold text-blue-900">
-                Arg<span className="text-blue-600">Base</span>
+                {getBannerText()}
               </h1>
             </a>
   
@@ -64,7 +73,13 @@ const NavigationBar = ({ navigate: navigationOverride }) => {
               </a>
               {user ? (
                 <>
-                  <span className="text-sm text-gray-600">{user.email}</span>
+                  <button 
+                    onClick={() => navigate('/profile')}
+                    className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 text-sm font-medium"
+                  >
+                    <User size={16} />
+                    <span>Profile</span>
+                  </button>
                   <button 
                     onClick={handleLogout}
                     className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 text-sm font-medium"
