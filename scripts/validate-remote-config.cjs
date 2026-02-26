@@ -17,12 +17,7 @@ function getProjectId() {
 
 async function getAccessToken() {
   if (process.env.FIREBASE_TOKEN) {
-    try {
-      const token = execSync('firebase auth:print-access-token', { encoding: 'utf8' });
-      return token.trim();
-    } catch (e) {
-      return process.env.FIREBASE_TOKEN;
-    }
+    return process.env.FIREBASE_TOKEN;
   }
   
   try {
