@@ -1,4 +1,4 @@
-# ArgBase Engineering Lifecycle Philosophy
+# SecureAgentBase Engineering Lifecycle Philosophy
 
 ## Guiding Principles
 
@@ -99,7 +99,7 @@ Individual deployments may take longer, but we reduce babysitting. Every failure
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ Staging Deployed Successfully                                │
-│    URL: https://argbase-staging.web.app                    │
+│    URL: ${VITE_STAGING_URL}                               │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -137,8 +137,8 @@ Individual deployments may take longer, but we reduce babysitting. Every failure
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ Production Deployed Successfully                            │
-│    URL: https://argbase.org                                │
+│ Production Deployed Successfully                             │
+│    URL: ${VITE_PRODUCTION_URL}                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 

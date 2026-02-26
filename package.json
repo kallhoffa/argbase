@@ -37,6 +37,7 @@
     "e2e:ci": "playwright test --config=playwright.ci.config.js",
     "e2e:smoke": "playwright test tests/e2e/smoke.spec.js",
     "e2e:smoke:ci": "playwright test tests/e2e/smoke.spec.js --config=playwright.ci.config.js",
+    "copy-framework": "node scripts/copy-framework.cjs",
     "prepare": "husky"
   },
   "eslintConfig": {
