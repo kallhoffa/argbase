@@ -17,14 +17,19 @@ function getProjectId() {
 
 async function getAccessToken() {
   if (process.env.FIREBASE_TOKEN) {
-    return process.env.FIREBASE_TOKEN;
+    try {
+      const token = execSync('firebase auth:print-access-token', { encoding: 'utf8' });
+      return token.trim();
+    } catch (e) {
+      return process.env.FIREBASE_TOKEN;
+    }
   }
   
   try {
-    const token = execSync('firebase auth:export --format=JSON', { encoding: 'utf8' });
-    return JSON.parse(token).access_token;
+    const token = execSync('firebase auth:print-access-token', { encoding: 'utf8' });
+    return token.trim();
   } catch (e) {
-    throw new Error('Failed to get Firebase access token. Set FIREBASE_TOKEN env var or run "firebase login".');
+    throw new Error('Failed to get Firebase access token. Run "firebase login" or set FIREBASE_TOKEN env var.');
   }
 }
 
