@@ -8,15 +8,33 @@ const getTestOverride = () => {
   return null;
 };
 
+const isStaging = () => {
+  if (typeof window === 'undefined') return false;
+  return window.location.hostname.includes('staging');
+};
+
 export const useFeatureFlag = (flagKey) => {
-  const [flagValue, setFlagValue] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [flagValue, setFlagValue] = useState(() => {
+    if (isStaging() && flagKey === 'navigation_banner') {
+      return 'beta';
+    }
+    return null;
+  });
+  const [loading, setLoading] = useState(!isStaging());
 
   useEffect(() => {
     let mounted = true;
 
     const loadFlag = async () => {
       try {
+        if (isStaging() && flagKey === 'navigation_banner') {
+          if (mounted) {
+            setFlagValue('beta');
+            setLoading(false);
+          }
+          return;
+        }
+
         const testOverride = getTestOverride();
         if (testOverride) {
           if (mounted) {

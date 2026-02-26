@@ -34,6 +34,7 @@ const Profile = ({ db }) => {
       const newValue = !betaEnabled;
       await setUserBetaPreference(db, user.uid, newValue);
       setBetaEnabled(newValue);
+      localStorage.setItem(`beta_enabled_${user.uid}`, newValue ? 'true' : 'false');
     } catch (error) {
       console.error('Error updating beta preference:', error);
       alert('Failed to update beta preference');
