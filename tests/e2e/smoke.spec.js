@@ -9,12 +9,12 @@ test.describe('Smoke Tests', () => {
   test('should show navigation bar', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('navigation')).toBeVisible();
-    await expect(page.getByText('ArgBase')).toBeVisible();
+    await expect(page.locator('nav').getByRole('link', { name: /ArgBase/i }).first()).toBeVisible();
   });
 
   test('should show search bar', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByPlaceholder('What would you like to know?')).toBeVisible();
+    await expect(page.locator('nav').getByPlaceholder('What would you like to know?')).toBeVisible();
   });
 
   test('should navigate to login page', async ({ page }) => {
