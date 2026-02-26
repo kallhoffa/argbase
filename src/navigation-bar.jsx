@@ -1,21 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './firestore-utils/auth-context';
 import useFeatureFlag from './hooks/useFeatureFlag';
+import { getUserPreferences } from './firestore-utils/user-preferences';
 import { BANNER_VARIANTS, isBannerVariant } from './config/featureFlags';
 
-const NavigationBar = ({ navigate: navigationOverride }) => {
+const NavigationBar = ({ navigate: navigationOverride, db }) => {
   const defaultNavigate = useNavigate();
   const navigate = navigationOverride || defaultNavigate;
   const [searchQuery, setSearchQuery] = useState('');
   const { user, logout } = useAuth();
   const { flagValue: bannerVariant, loading: bannerLoading } = useFeatureFlag('navigation_banner');
+  const [userBetaEnabled, setUserBetaEnabled] = useState(false);
+  
+  useEffect(() => {
+    const loadUserBeta = async () => {
+      if (user && db) {
+        try {
+          const prefs = await getUserPreferences(db, user.uid);
+          setUserBetaEnabled(prefs.beta_enabled || false);
+        } catch (e) {
+          // ignore - user might not have preferences yet
+        }
+      }
+    };
+    loadUserBeta();
+  }, [user, db]);
   
   const getBannerText = () => {
-    if (bannerLoading || !bannerVariant) return BANNER_VARIANTS.control;
-    if (isBannerVariant(bannerVariant)) return BANNER_VARIANTS.beta;
-    return BANNER_VARIANTS.control;
+    if (bannerLoading) return BANNER_VARIANTS.control;
+    const isBetaTreatment = isBannerVariant(bannerVariant) || userBetaEnabled;
+    return isBetaTreatment ? BANNER_VARIANTS.beta : BANNER_VARIANTS.control;
   };
   
   const handleSubmit = (e) => {

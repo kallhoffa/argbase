@@ -13,11 +13,11 @@ import Signup from './signup';
 import Profile from './profile';
 
 
-const RootLayout = () => {
+const RootLayout = ({ db }) => {
   return (
     <>
       <EnvironmentBanner />
-      <NavigationBar />
+      <NavigationBar db={db} />
       <div className="pt-16">
         <Outlet />
       </div>
@@ -31,7 +31,7 @@ function App({ db }) {
   return (
     <BrowserRouter>
       <Routes>
-          <Route element={<RootLayout />}>
+          <Route element={<RootLayout db={db} />}>
           <Route path="/" element={<Home/>} />
           <Route path="/question" element={<QuestionPage db={db}/>} />
           <Route path="/compose-answer" element={<ComposeAnswer db={db} />} />
