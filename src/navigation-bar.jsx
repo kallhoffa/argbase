@@ -6,13 +6,6 @@ import useFeatureFlag from './hooks/useFeatureFlag';
 import { getUserPreferences } from './firestore-utils/user-preferences';
 import { BANNER_VARIANTS, isBannerVariant } from './config/featureFlags';
 
-const getBetaFromStorage = (userId) => {
-  if (typeof window === 'undefined') return false;
-  const key = `beta_enabled_${userId}`;
-  const stored = localStorage.getItem(key);
-  return stored === 'true';
-};
-
 const setBetaInStorage = (userId, enabled) => {
   if (typeof window === 'undefined') return;
   const key = `beta_enabled_${userId}`;
@@ -24,33 +17,24 @@ const NavigationBar = ({ navigate: navigationOverride, db }) => {
   const navigate = navigationOverride || defaultNavigate;
   const [searchQuery, setSearchQuery] = useState('');
   const { user, logout } = useAuth();
-  const { flagValue: bannerVariant, loading: bannerLoading } = useFeatureFlag('navigation_banner');
-  const [userBetaEnabled, setUserBetaEnabled] = useState(() => {
-    if (user) {
-      return getBetaFromStorage(user.uid);
-    }
-    return false;
-  });
+  const { flagValue: bannerVariant } = useFeatureFlag('navigation_banner');
   
   useEffect(() => {
-    const loadUserBeta = async () => {
+    const syncUserBeta = async () => {
       if (user && db) {
         try {
           const prefs = await getUserPreferences(db, user.uid);
-          const betaEnabled = prefs.beta_enabled || false;
-          setUserBetaEnabled(betaEnabled);
-          setBetaInStorage(user.uid, betaEnabled);
+          setBetaInStorage(user.uid, prefs.beta_enabled || false);
         } catch (e) {
-          // ignore - user might not have preferences yet
+          // ignore
         }
       }
     };
-    loadUserBeta();
+    syncUserBeta();
   }, [user, db]);
   
   const getBannerText = () => {
-    if (bannerLoading) return BANNER_VARIANTS.control;
-    const isBetaTreatment = isBannerVariant(bannerVariant) || userBetaEnabled;
+    const isBetaTreatment = isBannerVariant(bannerVariant);
     return isBetaTreatment ? BANNER_VARIANTS.beta : BANNER_VARIANTS.control;
   };
   

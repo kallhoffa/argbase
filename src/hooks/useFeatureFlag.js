@@ -13,14 +13,38 @@ const isStaging = () => {
   return window.location.hostname.includes('staging');
 };
 
+const getBetaFromStorage = () => {
+  if (typeof window === 'undefined') return false;
+  const keys = Object.keys(localStorage);
+  for (const key of keys) {
+    if (key.startsWith('beta_enabled_')) {
+      return localStorage.getItem(key) === 'true';
+    }
+  }
+  return false;
+};
+
 export const useFeatureFlag = (flagKey) => {
-  const [flagValue, setFlagValue] = useState(() => {
+  const getInitialValue = () => {
     if (isStaging() && flagKey === 'navigation_banner') {
       return 'beta';
     }
+    if (flagKey === 'navigation_banner' && getBetaFromStorage()) {
+      return 'beta';
+    }
     return null;
+  };
+
+  const [flagValue, setFlagValue] = useState(getInitialValue);
+  const [loading, setLoading] = useState(() => {
+    if (isStaging() && flagKey === 'navigation_banner') {
+      return false;
+    }
+    if (flagKey === 'navigation_banner' && getBetaFromStorage()) {
+      return false;
+    }
+    return true;
   });
-  const [loading, setLoading] = useState(!isStaging());
 
   useEffect(() => {
     let mounted = true;
@@ -28,6 +52,14 @@ export const useFeatureFlag = (flagKey) => {
     const loadFlag = async () => {
       try {
         if (isStaging() && flagKey === 'navigation_banner') {
+          if (mounted) {
+            setFlagValue('beta');
+            setLoading(false);
+          }
+          return;
+        }
+
+        if (flagKey === 'navigation_banner' && getBetaFromStorage()) {
           if (mounted) {
             setFlagValue('beta');
             setLoading(false);

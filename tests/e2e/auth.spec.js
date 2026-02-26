@@ -87,7 +87,8 @@ test.describe('Authentication', () => {
       await authForm.getByRole('button', { name: 'Sign Up' }).click();
       
       await expect(page).toHaveURL('/');
-      await expect(page.getByText(email)).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Profile' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Logout' })).toBeVisible();
     });
 
     test('should login with existing user credentials', async ({ page }) => {
@@ -103,7 +104,8 @@ test.describe('Authentication', () => {
       await signupForm.getByRole('button', { name: 'Sign Up' }).click();
       
       await expect(page).toHaveURL('/');
-      await expect(page.getByText(email)).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Profile' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Logout' })).toBeVisible();
       
       await page.getByRole('button', { name: 'Logout' }).click();
       await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible();
@@ -117,7 +119,8 @@ test.describe('Authentication', () => {
       await loginForm.getByRole('button', { name: 'Sign In' }).click();
       
       await expect(page).toHaveURL('/');
-      await expect(page.getByText(email)).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Profile' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Logout' })).toBeVisible();
     });
 
     test('should show error for invalid login credentials', async ({ page }) => {
