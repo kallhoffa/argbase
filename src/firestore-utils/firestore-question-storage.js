@@ -1,4 +1,4 @@
-import { collection, addDoc, Timestamp, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, doc, updateDoc, arrayUnion, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
 
 /**
  * Interface for a comment on an answer
@@ -21,9 +21,12 @@ import { collection, addDoc, Timestamp, doc, updateDoc, arrayUnion } from 'fireb
 /**
  * Interface for a question
  * @typedef {Object} Question
+ * @property {string} id - The document ID
  * @property {string} title - The question text
  * @property {Answer[]} answers - Array of answers
  * @property {string[]} relatedQuestions - Array of related question titles
+ * @property {number} viewCount - Number of views
+ * @property {import('firebase/firestore').Timestamp} createdAt - Creation timestamp
  */
 
 /**
@@ -95,6 +98,72 @@ export const addAnswerToQuestion = async (db, questionId, newAnswer) => {
     });
   } catch (error) {
     console.error('Error adding answer:', error);
+    throw error;
+  }
+};
+
+/**
+ * Retrieves popular questions sorted by view count
+ * @param {import('firebase/firestore').Firestore} db - Firestore database instance
+ * @param {number} [limitCount=10] - Maximum number of questions to return
+ * @returns {Promise<Question[]>} Array of popular questions
+ */
+export const getPopularQuestions = async (db, limitCount = 10) => {
+  try {
+    const q = query(
+      collection(db, 'questions'),
+      orderBy('viewCount', 'desc'),
+      limit(limitCount)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error('Error fetching popular questions:', error);
+    throw error;
+  }
+};
+
+/**
+ * Retrieves recent questions sorted by creation date
+ * @param {import('firebase/firestore').Firestore} db - Firestore database instance
+ * @param {number} [limitCount=10] - Maximum number of questions to return
+ * @returns {Promise<Question[]>} Array of recent questions
+ */
+export const getRecentQuestions = async (db, limitCount = 10) => {
+  try {
+    const q = query(
+      collection(db, 'questions'),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error('Error fetching recent questions:', error);
+    throw error;
+  }
+};
+
+/**
+ * Retrieves all questions sorted alphabetically A-Z with cursor-based pagination
+ * @param {import('firebase/firestore').Firestore} db - Firestore database instance
+ * @param {import('firebase/firestore').QueryDocumentSnapshot} [cursorDoc=null] - Cursor document to start after
+ * @param {number} [pageSize=50] - Number of questions per page
+ * @returns {Promise<{questions: Question[], lastDoc: import('firebase/firestore').QueryDocumentSnapshot|null}>}
+ */
+export const getAllQuestionsAtoZ = async (db, cursorDoc = null, pageSize = 50) => {
+  try {
+    const constraints = [orderBy('title', 'asc'), limit(pageSize)];
+    if (cursorDoc) {
+      constraints.push(startAfter(cursorDoc));
+    }
+    const q = query(collection(db, 'questions'), ...constraints);
+    const snapshot = await getDocs(q);
+    const questions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const lastDoc = snapshot.docs[snapshot.docs.length - 1] || null;
+    return { questions, lastDoc };
+  } catch (error) {
+    console.error('Error fetching all questions:', error);
     throw error;
   }
 };

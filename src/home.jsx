@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 
 
@@ -54,6 +54,13 @@ function Home() {
           </button>
         </div>
       </form>
+
+      <Link 
+        to="/all-questions" 
+        className="block mt-6 text-blue-600 hover:text-blue-800 font-medium"
+      >
+        or see what others are asking
+      </Link>
 
       {/* Additional Info */}
       <div className="mt-12 text-gray-600 text-sm space-y-2">

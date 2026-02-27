@@ -11,6 +11,8 @@ import NavigationBar from './navigation-bar';
 import Login from './login';
 import Signup from './signup';
 import Profile from './profile';
+import AllQuestions from './all-questions';
+import EveryQuestion from './every-question';
 
 
 const RootLayout = ({ db }) => {
@@ -39,6 +41,8 @@ function App({ db }) {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile db={db} />} />
+          <Route path="/all-questions" element={<AllQuestions db={db} />} />
+          <Route path="/all-questions/every" element={<EveryQuestion db={db} />} />
         </Route>
       </Routes>
     </BrowserRouter>
