@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@sentry/react": "^10.40.0",
-    "firebase": "^11.0.1",
+    "firebase": "^12.10.0",
     "lucide-react": "^0.454.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
